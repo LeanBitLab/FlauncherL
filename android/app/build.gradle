@@ -92,6 +92,17 @@ android {
     }
 
     namespace 'me.efesser.flauncher'
+
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            def abi = output.getFilter(com.android.build.OutputFile.ABI)
+            if (abi != null) {
+                outputFileName = "FlauncherL-${abi}-${variant.buildType.name}.apk"
+            } else {
+                outputFileName = "FlauncherL-universal-${variant.buildType.name}.apk"
+            }
+        }
+    }
 }
 
 flutter {
