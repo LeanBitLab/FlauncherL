@@ -34,7 +34,7 @@ This customized version introduces usability enhancements and some UX improvemen
     <td><img src="docs/images/screenshot_1.png" width="100%" alt="Home Screen"/></td>
     <td><img src="docs/images/screenshot_2.png" width="100%" alt="Settings"/></td>
     <td><img src="docs/images/screenshot_3.png" width="100%" alt="Widget"/></td>
-    <td><img src="docs/images/screenshot_4.png" width="100%" alt="Screensaver"/></td>
+    <td><video src="docs/images/screensaver.mp4" width="100%" autoplay loop muted playsinline></video></td>
   </tr>
 </table>
 
