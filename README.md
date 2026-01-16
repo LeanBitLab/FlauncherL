@@ -14,6 +14,14 @@ This customized version introduces usability enhancements and some UX improvemen
 
 ## What's New in FlauncherL
 
+### Latest (v2024.11.001)
+- **🎯 Widget Reorganization** - Network indicator merged with WiFi usage for cleaner status bar
+- **🎨 TV Remote-Friendly Date/Time Selector** - Preset format selection with 6 date + 5 time options (no keyboard needed!)
+- **🔧 Network Indicator Toggle** - Show/hide network status independently
+- **⚡ Major Optimizations** - Migrated to Dart 3 records, removed unused assets (~6MB saved), APK down to 29.7MB
+- **🐛 Bug Fixes** - Fixed date/time toggle duplication issue
+
+### Previous Features
 - **📊 Data Usage Widget** - Track WiFi usage with user-defined monitoring periods
 - **🌙 Minimal Screensaver** - Inbuilt OLED-friendly screensaver with smooth clock position shifting to prevent burn-in
 - **⚡ Simplified Network Access** - WiFi icon now redirects directly to system settings
