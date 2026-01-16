@@ -1,13 +1,28 @@
-# FLauncher (fork)
-#### This is a fork of the GitLab repository at: https://gitlab.com/flauncher/flauncher.
+# FlauncherL
 
-FLauncher is an open-source alternative launcher for Android TV, built with [Flutter](https://flutter.dev).
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/banner.png">
+  <source media="(prefers-color-scheme: light)" srcset="assets/banner.png">
+  <img alt="FlauncherL Banner" src="assets/banner.png">
+</picture>
+
+**FlauncherL** is a fork of [FLauncher](https://github.com/osrosal/flauncher) (originally by [etienn01](https://gitlab.com/flauncher/flauncher)) - an open-source alternative launcher for Android TV.
+
+This customized version introduces improved defaults and usability enhancements by [LeanBitLab](https://github.com/LeanBitLab).
+
+## What's New in FlauncherL
+
+- **📊 Data Usage Widget** - Track WiFi usage with user-defined monitoring periods
+- **🌙 Minimal Screensaver** - Inbuilt OLED-friendly screensaver
+- **⚡ Simplified Network Access** - WiFi icon now redirects directly to system settings
+- **🖼️ Minimal Wallpaper** - Added "Pitch Black" gradient (Default)
+- **💡 UX Improvements** - Visual indicator when highlight animation is disabled
 
 ## Download
-Get the latest build from the [releases](https://github.com/osrosal/flauncher/releases) page, you can look for older builds on the [actions](https://github.com/CocoCR300/flauncher/actions) tab, where they are uploaded as artifacts.
 
-## Features
-For a list of the changes introduced by this fork from the original, see the [CHANGELOG](CHANGELOG.md) file.
+You can download the latest release from the [GitHub Releases](https://github.com/LeanBitLab/FlauncherL/releases) page.
+
+## Original FLauncher Features
 
 - [x] No ads
 - [x] Customizable categories
@@ -20,19 +35,13 @@ For a list of the changes introduced by this fork from the original, see the [CH
 - [x] Switch between row and grid for categories
 - [x] Support for non-TV (sideloaded) apps
 - [x] Navigation sound feedback
-- [ ] Force stop app
 
-## Screenshots
-|  |  |  |
-|--|--|--|
-| ![](screenshots/Screenshot_1624378896.png) | ![](screenshots/Screenshot_1624378921.png) | ![](screenshots/Screenshot_1624378938.png) |
+## Set FlauncherL as default launcher
 
-## Set FLauncher as default launcher
+### Method 1: Remap the Home button
+This is the "safer" and easiest way. Use [Button Mapper](https://play.google.com/store/apps/details?id=flar2.homebutton) to remap the Home button of the remote to launch FlauncherL.
 
-### Method 1: remap the Home button
-This is the "safer" and easiest way. Use [Button Mapper](https://play.google.com/store/apps/details?id=flar2.homebutton) to remap the Home button of the remote to launch FLauncher.
-
-### Method 2: disable the default launcher
+### Method 2: Disable the default launcher
 **:warning: Disclaimer :warning:**
 
 **You are doing this at your own risk, and you'll be responsible in any case of malfunction on your device.**
@@ -64,5 +73,13 @@ Because Android's `WallpaperManager` is not available on some Android TV devices
 
 Please note that changing wallpaper requires a file explorer to be installed on the device in order to pick a file.
 
-## Support the original author: [etienn01](https://github.com/etienn01)
-<a href="https://www.buymeacoffee.com/etienn01" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" width="200"></a>
+## Credits
+
+### Original Projects
+- **[FLauncher](https://gitlab.com/flauncher/flauncher)** by [etienn01](https://github.com/etienn01) - The original project
+- **[FLauncher (Fork)](https://github.com/osrosal/flauncher)** by [osrosal](https://github.com/osrosal) - The base for this fork
+
+---
+
+### FlauncherL
+Customizations by [LeanBitLab](https://github.com/LeanBitLab)
