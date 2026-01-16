@@ -13,10 +13,21 @@ This customized version introduces usability enhancements and some UX improvemen
 ## What's New in FlauncherL
 
 - **📊 Data Usage Widget** - Track WiFi usage with user-defined monitoring periods
-- **🌙 Minimal Screensaver** - Inbuilt OLED-friendly screensaver
+- **🌙 Minimal Screensaver** - Inbuilt OLED-friendly screensaver with smooth clock position shifting to prevent burn-in
 - **⚡ Simplified Network Access** - WiFi icon now redirects directly to system settings
 - **🖼️ Minimal Wallpaper** - Added "Pitch Black" gradient (Default)
 - **💡 UX Improvements** - Visual indicator when highlight animation is disabled
+
+## Screenshots
+
+<table style="border: none;">
+  <tr>
+    <td align="center" style="border: none;"><img src="docs/images/screenshot_1.png" width="100%" alt="Home Screen"/></td>
+    <td align="center" style="border: none;"><img src="docs/images/screenshot_2.png" width="100%" alt="App Drawer"/></td>
+    <td align="center" style="border: none;"><img src="docs/images/screenshot_3.png" width="100%" alt="Settings"/></td>
+    <td align="center" style="border: none;"><img src="docs/images/screenshot_4.png" width="100%" alt="Wallpaper"/></td>
+  </tr>
+</table>
 
 ## Original FLauncher Features
 
