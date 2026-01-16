@@ -1,14 +1,14 @@
 # FlauncherL
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/banner.png">
-  <source media="(prefers-color-scheme: light)" srcset="assets/banner.png">
-  <img alt="FlauncherL Banner" src="assets/banner.png">
+  <source media="(prefers-color-scheme: dark)" srcset="assets/banner_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="assets/banner_light.svg">
+  <img alt="FlauncherL Banner" src="assets/banner_light.svg">
 </picture>
 
 **FlauncherL** is a fork of [FLauncher](https://github.com/osrosal/flauncher) (originally by [etienn01](https://gitlab.com/flauncher/flauncher)) - an open-source alternative launcher for Android TV.
 
-This customized version introduces improved defaults and usability enhancements by [LeanBitLab](https://github.com/LeanBitLab).
+This customized version introduces usability enhancements and some UX improvements by [LeanBitLab](https://github.com/LeanBitLab).
 
 ## What's New in FlauncherL
 
@@ -17,10 +17,6 @@ This customized version introduces improved defaults and usability enhancements 
 - **⚡ Simplified Network Access** - WiFi icon now redirects directly to system settings
 - **🖼️ Minimal Wallpaper** - Added "Pitch Black" gradient (Default)
 - **💡 UX Improvements** - Visual indicator when highlight animation is disabled
-
-## Download
-
-You can download the latest release from the [GitHub Releases](https://github.com/LeanBitLab/FlauncherL/releases) page.
 
 ## Original FLauncher Features
 
@@ -82,4 +78,4 @@ Please note that changing wallpaper requires a file explorer to be installed on 
 ---
 
 ### FlauncherL
-Customizations by [LeanBitLab](https://github.com/LeanBitLab)
+- Customizations by [LeanBitLab](https://github.com/LeanBitLab)
