@@ -6,7 +6,7 @@
   <img alt="FlauncherL Banner" src="assets/banner_light.svg">
 </picture>
 
-[![Download](https://img.shields.io/github/v/release/LeanBitLab/FlauncherL?label=Download&style=for-the-badge&color=7C4DFF)](https://github.com/LeanBitLab/FlauncherL/releases/latest)
+[![Download](https://img.shields.io/github/v/release/LeanBitLab/FlauncherL?label=Download&style=for-the-badge&color=7C4DFF)](https://github.com/LeanBitLab/FlauncherL/releases/latest) [![Downloads](https://img.shields.io/github/downloads/LeanBitLab/FlauncherL/total?style=for-the-badge&color=7C4DFF&label=Downloads)](https://github.com/LeanBitLab/FlauncherL/releases)
 
 **FlauncherL** is a fork of [FLauncher](https://github.com/osrosal/flauncher) (originally by [etienn01](https://gitlab.com/flauncher/flauncher)) - an open-source alternative launcher for Android TV.
 
