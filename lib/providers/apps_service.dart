@@ -98,6 +98,10 @@ class AppsService extends ChangeNotifier
           String packageName = event['packageName'];
           await _database.deleteApps([packageName]);
 
+          // Clear icon cache for removed app
+          _iconCache.remove(packageName);
+          _bannerCache.remove(packageName);
+
           App? application = _applications.remove(packageName);
 
           if (application != null) {

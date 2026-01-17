@@ -86,11 +86,12 @@ class _DateTimeFormatDialogState extends State<DateTimeFormatDialog> {
         ),
         const SizedBox(height: 8),
         
-        ...dateFormatPresets.map((preset) => RadioListTile<String>(
+        ...dateFormatPresets.asMap().entries.map((entry) => RadioListTile<String>(
+          autofocus: entry.key == 0,  // Autofocus first item
           dense: true,
-          title: Text(preset.$2),  // Example display
-          subtitle: Text(preset.$1, style: TextStyle(fontSize: 12, color: Colors.grey)),
-          value: preset.$1,
+          title: Text(entry.value.$2),  // Example display
+          subtitle: Text(entry.value.$1, style: TextStyle(fontSize: 12, color: Colors.grey)),
+          value: entry.value.$1,
           groupValue: _selectedDateFormat,
           onChanged: (value) {
             setState(() => _selectedDateFormat = value!);
@@ -124,7 +125,6 @@ class _DateTimeFormatDialogState extends State<DateTimeFormatDialog> {
         Align(
           alignment: Alignment.centerRight,
           child: TextButton(
-            autofocus: true,
             onPressed: () {
               Navigator.pop(context, (_selectedDateFormat, _selectedTimeFormat));
             },

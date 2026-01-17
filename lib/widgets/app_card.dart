@@ -152,6 +152,13 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
                                     color: Colors.white.withAlpha(_animation.value.round()),
                                     width: 3
                                   ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withAlpha((_animation.value * 0.5).round()),
+                                      blurRadius: 8,
+                                      spreadRadius: 1,
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -167,6 +174,13 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
                                   color: Colors.white,
                                   width: 3
                                 ),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black54,
+                                    blurRadius: 8,
+                                    spreadRadius: 1,
+                                  ),
+                                ],
                               ),
                             ),
                           );

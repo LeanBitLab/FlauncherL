@@ -47,37 +47,37 @@ class _FocusAwareAppBarState extends State<FocusAwareAppBar>
         return widget!;
       },
       child: AppBar(
-        title: Selector<SettingsService, bool>(
-          selector: (_, settings) => settings.showNetworkIndicatorInStatusBar,
-          builder: (context, showNetwork, _) => Selector<SettingsService, bool>(
-            selector: (_, settings) => settings.showWifiWidgetInStatusBar,
-            builder: (context, showWifi, _) => Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (showNetwork)
-                  const Padding(
-                    padding: EdgeInsets.only(right: 12),
-                    child: NetworkWidget(),
-                  ),
-                if (showWifi) const DailyWifiUsageWidget(),
-              ],
+        // Left side: Settings, Network indicator, WiFi usage
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Settings button (moved to left side)
+            _FocusableIconButton(
+              icon: Icons.settings_outlined,
+              onPressed: () => showDialog(context: context, builder: (_) => const SettingsPanel()),
             ),
-          ),
+            const SizedBox(width: 16),
+            // Network indicator (conditionally shown)
+            Selector<SettingsService, bool>(
+              selector: (_, settings) => settings.showNetworkIndicatorInStatusBar,
+              builder: (context, showNetwork, _) => showNetwork
+                ? Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: _FocusableNetworkWidget(),
+                  )
+                : const SizedBox.shrink(),
+            ),
+            // WiFi usage widget
+            Selector<SettingsService, bool>(
+              selector: (_, settings) => settings.showWifiWidgetInStatusBar,
+              builder: (context, showWifi, _) => showWifi
+                ? const DailyWifiUsageWidget()
+                : const SizedBox.shrink(),
+            ),
+          ],
         ),
+        // Right side: Date/Time only
         actions: [
-          IconButton(
-            padding: const EdgeInsets.all(2),
-            constraints: const BoxConstraints(),
-            splashRadius: 20,
-            icon: const Icon(Icons.settings_outlined,
-              shadows: [
-                Shadow(color: Colors.black54, blurRadius: 8, offset: Offset(0, 2))
-              ],
-            ),
-            onPressed: () => showDialog(context: context, builder: (_) => const SettingsPanel()),
-            // sometime after Flutter 3.7.5, no later than 3.16.8, the focus highlight went away
-            focusColor: Theme.of(context).primaryColorLight,
-          ),
           Padding(
             padding: const EdgeInsets.only(left: 16, right: 32),
             child: Selector<SettingsService,
@@ -92,16 +92,13 @@ class _FocusAwareAppBarState extends State<FocusAwareAppBar>
               dateFormat: service.dateFormat,
               timeFormat: service.timeFormat),
               builder: (context, dateTimeSettings, _) {
-                // TODO: Disabling the "show date" option while both are enabled causes the *time* to disappear,
-                // then re-enabling that same option causes the time to appear twice.
-                // A restart (or just changing to the full screen clock) fixes the issue, but why does this happen?
                 return Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (dateTimeSettings.showDateInStatusBar)
                       Flexible(
                           child: DateTimeWidget(dateTimeSettings.dateFormat,
-                            key: const ValueKey('date'),  // Unique key for date widget
+                            key: const ValueKey('date'),
                             updateInterval: const Duration(minutes: 1),
                             textStyle: Theme.of(context).textTheme.titleLarge!.copyWith(
                               shadows: [
@@ -115,7 +112,7 @@ class _FocusAwareAppBarState extends State<FocusAwareAppBar>
                     if (dateTimeSettings.showTimeInStatusBar)
                       Flexible(
                         child: DateTimeWidget(dateTimeSettings.timeFormat,
-                          key: const ValueKey('time'),  // Unique key for time widget
+                          key: const ValueKey('time'),
                           textStyle: Theme.of(context).textTheme.titleLarge!.copyWith(
                             shadows: [
                               const Shadow(color: Colors.black54, offset: Offset(0, 2), blurRadius: 8)
@@ -130,6 +127,78 @@ class _FocusAwareAppBarState extends State<FocusAwareAppBar>
           ),
         ],
       )
+    );
+  }
+}
+
+/// Reusable focusable icon button with consistent outline focus indicator
+class _FocusableIconButton extends StatefulWidget {
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  const _FocusableIconButton({required this.icon, required this.onPressed});
+
+  @override
+  State<_FocusableIconButton> createState() => _FocusableIconButtonState();
+}
+
+class _FocusableIconButtonState extends State<_FocusableIconButton> {
+  bool _focused = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Focus(
+      onFocusChange: (hasFocus) => setState(() => _focused = hasFocus),
+      child: InkWell(
+        onTap: widget.onPressed,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.all(4),  // Match network indicator padding
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            border: _focused
+              ? Border.all(color: Colors.white, width: 2)
+              : null,
+            boxShadow: _focused
+              ? const [BoxShadow(color: Colors.black54, blurRadius: 8, spreadRadius: 1)]
+              : null,
+          ),
+          child: Icon(widget.icon,
+            shadows: const [
+              Shadow(color: Colors.black54, blurRadius: 8, offset: Offset(0, 2))
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Network widget with consistent focus indicator
+class _FocusableNetworkWidget extends StatefulWidget {
+  @override
+  State<_FocusableNetworkWidget> createState() => _FocusableNetworkWidgetState();
+}
+
+class _FocusableNetworkWidgetState extends State<_FocusableNetworkWidget> {
+  bool _focused = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Focus(
+      onFocusChange: (hasFocus) => setState(() => _focused = hasFocus),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          border: _focused
+            ? Border.all(color: Colors.white, width: 2)
+            : null,
+          boxShadow: _focused
+            ? const [BoxShadow(color: Colors.black54, blurRadius: 8, spreadRadius: 1)]
+            : null,
+        ),
+        child: const NetworkWidget(),
+      ),
     );
   }
 }
