@@ -142,7 +142,7 @@ class AppsService extends ChangeNotifier
 
     return _database.transaction(() async {
       if (tvApplications.isNotEmpty) {
-        int categoryId = await addCategory("TV Applications",
+        int categoryId = await addCategory("TV Apps",
             type: CategoryType.grid, shouldNotifyListeners: false
         );
 
@@ -152,7 +152,7 @@ class AppsService extends ChangeNotifier
         }
       }
       if (nonTvApplications.isNotEmpty) {
-        int categoryId = await addCategory("Non-TV Applications",
+        int categoryId = await addCategory("Non-TV Apps",
           shouldNotifyListeners: false,
         );
         Category nonTvAppsCategory = _categoriesById[categoryId]!;
@@ -330,6 +330,101 @@ class AppsService extends ChangeNotifier
       categoryFound.applications.remove(application);
 
       notifyListeners();
+    }
+  }
+
+  /// Auto-populates a category based on its special name
+  /// For TV Apps: adds all non-sideloaded apps
+  /// For Non-TV Apps: adds all sideloaded apps
+  /// For All Apps: adds all non-hidden apps (TV + Non-TV)
+  Future<void> autoPopulateCategory(Category category) async {
+    // Get the actual category from internal map
+    if (!_categoriesById.containsKey(category.id)) {
+      return;
+    }
+    Category actualCategory = _categoriesById[category.id]!;
+    
+    Iterable<App> appsToAdd;
+    
+    switch (actualCategory.name) {
+      case 'TV Apps':
+        appsToAdd = _applications.values.where((app) => !app.sideloaded && !app.hidden);
+        break;
+      case 'Non-TV Apps':
+        appsToAdd = _applications.values.where((app) => app.sideloaded && !app.hidden);
+        break;
+      case 'All Apps':
+        appsToAdd = _applications.values.where((app) => !app.hidden);
+        break;
+      default:
+        return; // Not a special category
+    }
+    
+    for (final app in appsToAdd) {
+      await addToCategory(app, actualCategory, shouldNotifyListeners: false);
+    }
+    
+    notifyListeners();
+  }
+
+  // === FAVORITES METHODS ===
+  
+  /// Gets the Favorites category, creating it if it doesn't exist
+  Future<Category> getOrCreateFavoritesCategory() async {
+    // Look for existing Favorites category
+    Category? favorites = _categoriesById.values.firstWhereOrNull(
+      (category) => category.name == 'Favorites'
+    );
+    
+    if (favorites != null) {
+      return favorites;
+    }
+    
+    // Create Favorites category if it doesn't exist
+    int categoryId = await addCategory('Favorites', shouldNotifyListeners: false);
+    return _categoriesById[categoryId]!;
+  }
+  
+  /// Checks if an app is in the Favorites category
+  bool isAppInFavorites(App app) {
+    Category? favorites = _categoriesById.values.firstWhereOrNull(
+      (category) => category.name == 'Favorites'
+    );
+    
+    if (favorites == null) {
+      return false;
+    }
+    
+    return favorites.applications.any((a) => a.packageName == app.packageName);
+  }
+  
+  /// Adds an app to Favorites
+  Future<void> addToFavorites(App app) async {
+    Category favorites = await getOrCreateFavoritesCategory();
+    
+    // Check if already in favorites
+    if (!favorites.applications.any((a) => a.packageName == app.packageName)) {
+      await addToCategory(app, favorites);
+    }
+  }
+  
+  /// Removes an app from Favorites
+  Future<void> removeFromFavorites(App app) async {
+    Category? favorites = _categoriesById.values.firstWhereOrNull(
+      (category) => category.name == 'Favorites'
+    );
+    
+    if (favorites != null) {
+      await removeFromCategory(app, favorites);
+    }
+  }
+  
+  /// Toggles an app in/out of Favorites
+  Future<void> toggleFavorite(App app) async {
+    if (isAppInFavorites(app)) {
+      await removeFromFavorites(app);
+    } else {
+      await addToFavorites(app);
     }
   }
 

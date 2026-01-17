@@ -26,6 +26,23 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../models/category.dart';
 
+// Section name presets for TV remote-friendly selection
+// First 3 are special auto-populating categories
+const List<String> sectionNamePresets = [
+  'TV Apps',             // Auto: non-sideloaded apps
+  'Non-TV Apps',         // Auto: sideloaded apps
+  'All Apps',            // Auto: all non-hidden apps
+  'Movies & Shows',
+  'Music',
+  'Games',
+  'Entertainment',
+  'Live TV',
+  'Sports',
+  'News',
+  'Tools',
+  'Favorites',
+];
+
 class _SettingsState extends ChangeNotifier
 {
   bool _changed;
@@ -221,9 +238,15 @@ class LauncherSectionPanelPage extends StatelessWidget
                   return Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.greenAccent[700],
-                        foregroundColor: Colors.white
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStatePropertyAll(Colors.greenAccent[700]),
+                        foregroundColor: WidgetStatePropertyAll(Colors.white),
+                        side: WidgetStateProperty.resolveWith((states) {
+                          if (states.contains(WidgetState.focused)) {
+                            return BorderSide(color: Colors.white, width: 3);
+                          }
+                          return null;
+                        }),
                       ),
                       child: Text(localizations.save),
                       onPressed: onSavePressed
@@ -236,9 +259,15 @@ class LauncherSectionPanelPage extends StatelessWidget
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
                   child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red[400],
-                      foregroundColor: Colors.white
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(Colors.red[400]),
+                      foregroundColor: WidgetStatePropertyAll(Colors.white),
+                      side: WidgetStateProperty.resolveWith((states) {
+                        if (states.contains(WidgetState.focused)) {
+                          return BorderSide(color: Colors.white, width: 3);
+                        }
+                        return null;
+                      }),
                     ),
                     child: Text(localizations.delete),
                     onPressed: () async {
@@ -358,22 +387,26 @@ class _CategorySettingsState extends State<_CategorySettings>
         _listTile(
           context,
           Text(localizations.name),
-          TextFormField(
-            autovalidateMode: AutovalidateMode.always,
-            controller: _nameController,
-            focusNode: _textFieldFocusNode,
-            textCapitalization: TextCapitalization.sentences,
-            onChanged: (value) {
-              _name = value;
-              _notifyChange();
-            },
-            validator: (value) {
-              if (value!.isEmpty) {
-                return localizations.mustNotBeEmpty;
-              }
-
-              return null;
-            }
+          Padding(
+            padding: EdgeInsets.only(top: 4),
+            child: DropdownButton<String>(
+              autofocus: _creating,
+              isDense: true,
+              isExpanded: true,
+              value: sectionNamePresets.contains(_name) ? _name : null,
+              hint: Text(_name.isEmpty ? 'Select a name' : _name, style: Theme.of(context).textTheme.bodySmall),
+              onChanged: (value) {
+                setState(() {
+                  _name = value!;
+                  _nameController.text = _name;
+                });
+                _notifyChange();
+              },
+              items: sectionNamePresets.map((name) => DropdownMenuItem(
+                value: name,
+                child: Text(name, style: Theme.of(context).textTheme.bodySmall),
+              )).toList(),
+            )
           )
         ),
         _listTile(
@@ -516,12 +549,30 @@ class _CategorySettingsState extends State<_CategorySettings>
   {
     final AppsService service = context.read();
     if (_creating) {
-      await service.addCategory(_name, sort: _categorySort, type: _categoryType,
+      int categoryId = await service.addCategory(_name, sort: _categorySort, type: _categoryType,
           columnsCount: _columnsCount, rowHeight: _rowHeight
       );
 
+      // Auto-populate special categories
+      if (_name == 'TV Apps' || _name == 'Non-TV Apps' || _name == 'All Apps') {
+        try {
+          // Find the actual category object using the ID we just got
+          final createdCategory = service.categories.firstWhere((c) => c.id == categoryId);
+          await service.autoPopulateCategory(createdCategory);
+        } catch (e) {
+          // Ignore error if category not found immediately
+        }
+      }
+
       _SettingsState state = context.read();
-      state.setLauncherSection(service.launcherSections[0]);
+      try {
+         // Try to find the section we just created to set it as active
+         final createdSection = service.launcherSections.firstWhere((s) => s is Category && s.id == categoryId);
+         state.setLauncherSection(createdSection);
+      } catch (e) {
+         // Fallback to first section
+         state.setLauncherSection(service.launcherSections[0]);
+      }
     }
     else {
       await service.updateCategory(_category!.id, _name, _categorySort,

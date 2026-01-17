@@ -49,7 +49,7 @@ class _ApplicationsPanelPageState extends State<ApplicationsPanelPage> {
     }
 
     return DefaultTabController(
-        length: 3,
+        length: 4,
         child: Column(
           children: [
             Text(_title, style: Theme.of(context).textTheme.titleLarge),
@@ -66,6 +66,9 @@ class _ApplicationsPanelPageState extends State<ApplicationsPanelPage> {
                       setState(() => _title = localizations.nonTvApplications);
                       break;
                     case 2:
+                      setState(() => _title = localizations.favoriteApps);
+                      break;
+                    case 3:
                       setState(() => _title = localizations.hiddenApplications);
                       break;
                     default:
@@ -75,12 +78,13 @@ class _ApplicationsPanelPageState extends State<ApplicationsPanelPage> {
                 tabs: const [
                   Focus(autofocus: true, child: Tab(icon: Icon(Icons.tv))),
                   Tab(icon: Icon(Icons.android)),
+                  Tab(icon: Icon(Icons.star)),
                   Tab(icon: Icon(Icons.visibility_off_outlined)),
                 ],
               ),
             ),
             const SizedBox(height: 8),
-            Expanded(child: TabBarView(children: [_TVTab(), _SideloadedTab(), _HiddenTab()])),
+            Expanded(child: TabBarView(children: [_TVTab(), _SideloadedTab(), _FavoritesTab(), _HiddenTab()])),
           ],
         ),
       );
@@ -103,6 +107,25 @@ class _SideloadedTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Selector<AppsService, List<App>>(
         selector: (_, appsService) => appsService.applications.where((app) => app.sideloaded && !app.hidden).toList(),
+        builder: (context, applications, _) => ListView(
+          children: applications
+              .map((application) => EnsureVisible(alignment: 0.5, child: _AppListItem(application)))
+              .toList(),
+        ),
+      );
+}
+
+class _FavoritesTab extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => Selector<AppsService, List<App>>(
+        selector: (_, appsService) {
+          // Get apps in the Favorites category
+          final favorites = appsService.categories.firstWhere(
+            (category) => category.name == 'Favorites',
+            orElse: () => Category(name: 'Favorites'),
+          );
+          return favorites.applications.where((app) => !app.hidden).toList();
+        },
         builder: (context, applications, _) => ListView(
           children: applications
               .map((application) => EnsureVisible(alignment: 0.5, child: _AppListItem(application)))

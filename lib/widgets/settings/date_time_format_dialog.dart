@@ -32,13 +32,14 @@ const List<(String format, String example)> dateFormatPresets = [
   ('M/d/y', '1/17/2026'),
 ];
 
-// Time format presets
+// Time format presets (using 3:45 PM / 15:45 for clear 12h/24h distinction)
 const List<(String format, String example)> timeFormatPresets = [
-  ('H:mm', '1:43'),
-  ('HH:mm', '01:43'),
-  ('h:mm a', '1:43 AM'),
-  ('hh:mm a', '01:43 AM'),
-  ('H:mm:ss', '1:43:30'),
+  ('H:mm', '15:45'),
+  ('HH:mm', '15:45'),
+  ('hh:mm', '03:45'),
+  ('h:mm a', '3:45 PM'),
+  ('hh:mm a', '03:45 PM'),
+  ('H:mm:ss', '15:45:30'),
 ];
 
 class DateTimeFormatDialog extends StatefulWidget {

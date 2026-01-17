@@ -92,6 +92,32 @@ class ApplicationInfoPanel extends StatelessWidget
                        Navigator.of(context).pop(ApplicationInfoPanelResult.none);
                      },
                    ),
+                   // Favorites toggle button
+                   Builder(
+                     builder: (context) {
+                       final appsService = context.watch<AppsService>();
+                       final isInFavorites = appsService.isAppInFavorites(application);
+                       return TextButton(
+                         child: Row(
+                           children: [
+                             Icon(isInFavorites ? Icons.star : Icons.star_border),
+                             Container(width: 8),
+                             Flexible(
+                               child: Text(
+                                 isInFavorites ? 'Remove from Fav' : 'Add to Fav',
+                                 style: Theme.of(context).textTheme.bodyMedium,
+                                 overflow: TextOverflow.ellipsis,
+                               ),
+                             ),
+                           ],
+                         ),
+                         onPressed: () async {
+                           await appsService.toggleFavorite(application);
+                           Navigator.of(context).pop(ApplicationInfoPanelResult.none);
+                         },
+                       );
+                     },
+                   ),
                    if (category?.sort == CategorySort.manual)
                      TextButton(
                        child: Row(
