@@ -9,18 +9,37 @@ import 'network_widget.dart';
 
 class FocusAwareAppBar extends StatefulWidget implements PreferredSizeWidget
 {
+  const FocusAwareAppBar({Key? key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
-    return _FocusAwareAppBarState();
+    return FocusAwareAppBarState();
   }
 
   @override
   Size get preferredSize => Size.fromHeight(kToolbarHeight);
 }
 
-class _FocusAwareAppBarState extends State<FocusAwareAppBar>
+class FocusAwareAppBarState extends State<FocusAwareAppBar>
 {
   bool focused = false;
+  late FocusNode _settingsFocusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _settingsFocusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    _settingsFocusNode.dispose();
+    super.dispose();
+  }
+
+  void focusSettings() {
+    _settingsFocusNode.requestFocus();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +73,7 @@ class _FocusAwareAppBarState extends State<FocusAwareAppBar>
             // Settings button (moved to left side)
             _FocusableIconButton(
               icon: Icons.settings_outlined,
+              focusNode: _settingsFocusNode,
               onPressed: () => showDialog(context: context, builder: (_) => const SettingsPanel()),
             ),
             const SizedBox(width: 16),
@@ -135,8 +155,9 @@ class _FocusAwareAppBarState extends State<FocusAwareAppBar>
 class _FocusableIconButton extends StatefulWidget {
   final IconData icon;
   final VoidCallback onPressed;
+  final FocusNode? focusNode;
 
-  const _FocusableIconButton({required this.icon, required this.onPressed});
+  const _FocusableIconButton({required this.icon, required this.onPressed, this.focusNode});
 
   @override
   State<_FocusableIconButton> createState() => _FocusableIconButtonState();
@@ -147,26 +168,33 @@ class _FocusableIconButtonState extends State<_FocusableIconButton> {
 
   @override
   Widget build(BuildContext context) {
-    return Focus(
-      onFocusChange: (hasFocus) => setState(() => _focused = hasFocus),
-      child: InkWell(
-        onTap: widget.onPressed,
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          padding: const EdgeInsets.all(4),  // Match network indicator padding
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            border: _focused
-              ? Border.all(color: Colors.white, width: 2)
-              : null,
-            boxShadow: _focused
-              ? const [BoxShadow(color: Colors.black54, blurRadius: 8, spreadRadius: 1)]
-              : null,
-          ),
-          child: Icon(widget.icon,
-            shadows: const [
-              Shadow(color: Colors.black54, blurRadius: 8, offset: Offset(0, 2))
-            ],
+    return Actions(
+      actions: <Type, Action<Intent>>{
+        ActivateIntent: CallbackAction<ActivateIntent>(onInvoke: (_) => widget.onPressed()),
+        ButtonActivateIntent: CallbackAction<ButtonActivateIntent>(onInvoke: (_) => widget.onPressed()),
+      },
+      child: Focus(
+        focusNode: widget.focusNode,
+        onFocusChange: (hasFocus) => setState(() => _focused = hasFocus),
+        child: InkWell(
+          onTap: widget.onPressed,
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            padding: const EdgeInsets.all(4),  // Match network indicator padding
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: _focused
+                ? Border.all(color: Colors.white, width: 2)
+                : null,
+              boxShadow: _focused
+                ? const [BoxShadow(color: Colors.black54, blurRadius: 8, spreadRadius: 1)]
+                : null,
+            ),
+            child: Icon(widget.icon,
+              shadows: const [
+                Shadow(color: Colors.black54, blurRadius: 8, offset: Offset(0, 2))
+              ],
+            ),
           ),
         ),
       ),

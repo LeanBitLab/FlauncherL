@@ -18,7 +18,8 @@
 
 import 'package:flauncher/database.dart';
 import 'package:flauncher/providers/apps_service.dart';
-import 'package:flauncher/widgets/right_panel_dialog.dart';
+import 'package:flauncher/widgets/add_to_category_dialog.dart';
+import 'package:flauncher/widgets/side_panel_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -42,7 +43,9 @@ class ApplicationInfoPanel extends StatelessWidget
   Widget build(BuildContext context) {
     AppLocalizations localizations = AppLocalizations.of(context)!;
 
-    return RightPanelDialog(
+    return SidePanelDialog(
+        width: 300,
+        isRightSide: false,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -79,6 +82,35 @@ class ApplicationInfoPanel extends StatelessWidget
               child: SingleChildScrollView(
                 child: Column(
                  children: [
+                   // Add to Category button (First as requested)
+                   TextButton(
+                     child: Row(
+                       children: [
+                         const Icon(Icons.add_box_outlined),
+                         Container(width: 8),
+                         Text('Add to Category', style: Theme.of(context).textTheme.bodyMedium),
+                       ],
+                     ),
+                     onPressed: () async {
+                       Navigator.of(context).pop(ApplicationInfoPanelResult.none);
+                       await showDialog(
+                         context: context,
+                         builder: (context) => AddToCategoryDialog(application),
+                       );
+                     },
+                   ),
+                   // Reorder button (Second as requested)
+                   if (category?.sort == CategorySort.manual)
+                     TextButton(
+                       child: Row(
+                         children: [
+                           const Icon(Icons.open_with),
+                           Container(width: 8),
+                           Text(localizations.reorder, style: Theme.of(context).textTheme.bodyMedium),
+                         ],
+                       ),
+                       onPressed: () => Navigator.of(context).pop(ApplicationInfoPanelResult.reorderApp),
+                     ),
                    TextButton(
                      child: Row(
                        children: [
@@ -118,17 +150,6 @@ class ApplicationInfoPanel extends StatelessWidget
                        );
                      },
                    ),
-                   if (category?.sort == CategorySort.manual)
-                     TextButton(
-                       child: Row(
-                         children: [
-                           const Icon(Icons.open_with),
-                           Container(width: 8),
-                           Text(localizations.reorder, style: Theme.of(context).textTheme.bodyMedium),
-                         ],
-                       ),
-                       onPressed: () => Navigator.of(context).pop(ApplicationInfoPanelResult.reorderApp),
-                     ),
                    TextButton(
                      child: Row(
                        children: [

@@ -79,11 +79,22 @@ class FLauncherApp extends StatelessWidget
         useMaterial3: true,
         brightness: Brightness.dark,
         primarySwatch: _swatch,
-        cardColor: _swatch[300],
-        canvasColor: _swatch[300],
-        dialogBackgroundColor: _swatch[400],
-        scaffoldBackgroundColor: _swatch[400],
-        textButtonTheme: TextButtonThemeData(style: TextButton.styleFrom(foregroundColor: Colors.white)),
+        cardColor: const Color(0xFF1E1E1E), // Dark surface color
+        canvasColor: const Color(0xFF121212), // Dark background
+        dialogBackgroundColor: const Color(0xFF1E1E1E),
+        scaffoldBackgroundColor: const Color(0xFF121212), // Dark background
+        textButtonTheme: TextButtonThemeData(
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.white, // Revert to white for settings list
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            )
+        ),
+        dialogTheme: DialogTheme(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          backgroundColor: const Color(0xFF1E1E1E),
+          titleTextStyle: Typography.material2018().white.titleLarge,
+          contentTextStyle: Typography.material2018().white.bodyMedium,
+        ),
         appBarTheme: const AppBarTheme(elevation: 0, backgroundColor: Colors.transparent),
         typography: Typography.material2018(),
         inputDecorationTheme: InputDecorationTheme(

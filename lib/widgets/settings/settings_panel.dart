@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:flauncher/widgets/right_panel_dialog.dart';
+import 'package:flauncher/widgets/side_panel_dialog.dart';
 import 'package:flauncher/widgets/settings/applications_panel_page.dart';
 import 'package:flauncher/widgets/settings/launcher_sections_panel_page.dart';
 import 'package:flauncher/widgets/settings/gradient_panel_page.dart';
@@ -24,6 +24,12 @@ import 'package:flauncher/widgets/settings/launcher_section_panel_page.dart';
 import 'package:flauncher/widgets/settings/settings_panel_page.dart';
 import 'package:flauncher/widgets/settings/status_bar_panel_page.dart';
 import 'package:flauncher/widgets/settings/wallpaper_panel_page.dart';
+import 'package:flauncher/widgets/settings/wifi_usage_period_page.dart';
+import 'package:flauncher/widgets/settings/back_button_action_page.dart';
+import 'package:flauncher/widgets/settings/date_time_format_page.dart';
+import 'package:flauncher/widgets/settings/app_details_page.dart';
+import 'package:flauncher/widgets/settings/misc_panel_page.dart';
+import 'package:flauncher/models/app.dart';
 import 'package:flutter/material.dart';
 
 class SettingsPanel extends StatefulWidget {
@@ -43,8 +49,9 @@ class _SettingsPanelState extends State<SettingsPanel> {
     onWillPop: () async => !await _navigatorKey.currentState!.maybePop(),
     child: Scaffold(
       backgroundColor: Colors.transparent,
-      body: RightPanelDialog(
+      body: SidePanelDialog(
         width: 350,
+        isRightSide: false, // Left side as requested by user
         child: Navigator(
           key: _navigatorKey,
           initialRoute: widget.initialRoute ?? SettingsPanelPage.routeName,
@@ -65,6 +72,17 @@ class _SettingsPanelState extends State<SettingsPanel> {
               case LauncherSectionPanelPage.routeName:
                 return MaterialPageRoute(
                     builder: (_) => LauncherSectionPanelPage(sectionIndex: settings.arguments as int?));
+              case WifiUsagePeriodPage.routeName:
+                return MaterialPageRoute(builder: (_) => WifiUsagePeriodPage());
+              case BackButtonActionPage.routeName:
+                return MaterialPageRoute(builder: (_) => BackButtonActionPage());
+              case DateTimeFormatPage.routeName:
+                return MaterialPageRoute(builder: (_) => DateTimeFormatPage());
+              case MiscPanelPage.routeName:
+                return MaterialPageRoute(builder: (_) => MiscPanelPage());
+              case AppDetailsPage.routeName:
+                 return MaterialPageRoute(
+                    builder: (_) => AppDetailsPage(application: settings.arguments as App));
               default:
                 throw ArgumentError.value(settings.name, "settings.name", "Route not supported.");
             }

@@ -1,3 +1,4 @@
+import 'package:flauncher/widgets/settings/focusable_settings_tile.dart';
 import 'package:flutter/material.dart';
 
 class RoundedSwitchListTile extends StatelessWidget {
@@ -18,25 +19,16 @@ class RoundedSwitchListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
+    return FocusableSettingsTile(
       autofocus: autofocus,
       onPressed: () => onChanged(!value),
-      child: Container(
-        constraints: BoxConstraints(maxWidth: 300),
-        child: Row(
-          children: [
-            secondary,
-            SizedBox(width: 8),
-            Expanded(child: title),
-            SizedBox(width: 8),
-            Container(
-              constraints: BoxConstraints(maxHeight: 16),
-              child: Switch(
-                value: value,
-                onChanged: onChanged,
-              )
-            ),
-          ],
+      leading: secondary,
+      title: title,
+      trailing: Container(
+        constraints: const BoxConstraints(maxHeight: 16),
+        child: Switch(
+          value: value,
+          onChanged: onChanged,
         )
       ),
     );

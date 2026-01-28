@@ -86,7 +86,7 @@
     "showCategoryTitles": "Mostrar títulos de categorías",
     "sort": "Orden",
     "systemSettings": "Ajustes del sistema",
-    "textAboutDialog": "FLauncher es un lanzador de aplicaciones alternativo de código abierto para Android TV.\nCódigo fuente disponible en {repoUrl}.\n\nLogo creado por Katie (@fureturoe) y diseño por @FXCostanzo.",
+    "textAboutDialog": "FlauncherL es un lanzador de código abierto personalizado para Android TV, basado en FLauncher.\n\nDesarrollado por LeanBitLab.\nCódigo fuente disponible en {repoUrl}.\n\nLogo creado por Katie (@fureturoe) y diseño por @FXCostanzo.",
     "@textAboutDialog": {
         "placeholders": {
             "repoUrl": {

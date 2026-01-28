@@ -24,6 +24,7 @@ import 'package:drift/drift.dart';
 import 'package:flauncher/database.dart';
 import 'package:flauncher/flauncher_channel.dart';
 import 'package:flutter/foundation.dart' hide Category;
+import 'package:flutter/widgets.dart' hide Category;
 
 import '../models/app.dart';
 import '../models/category.dart';
@@ -43,6 +44,19 @@ class AppsService extends ChangeNotifier
   Map<int, Category> _categoriesById = Map();
 
   bool get initialized => _initialized;
+
+  String? _pendingReorderFocusPackage;
+  int? _pendingReorderFocusCategoryId;
+  String? get pendingReorderFocusPackage => _pendingReorderFocusPackage;
+  int? get pendingReorderFocusCategoryId => _pendingReorderFocusCategoryId;
+  void clearPendingReorderFocusPackage() {
+    _pendingReorderFocusPackage = null;
+    _pendingReorderFocusCategoryId = null;
+  }
+  void setPendingReorderFocus(String packageName, int categoryId) {
+    _pendingReorderFocusPackage = packageName;
+    _pendingReorderFocusCategoryId = categoryId;
+  }
 
   List<App> get applications => UnmodifiableListView(_applications.values.sortedBy((application) => application.name));
 
@@ -336,7 +350,6 @@ class AppsService extends ChangeNotifier
   /// Auto-populates a category based on its special name
   /// For TV Apps: adds all non-sideloaded apps
   /// For Non-TV Apps: adds all sideloaded apps
-  /// For All Apps: adds all non-hidden apps (TV + Non-TV)
   Future<void> autoPopulateCategory(Category category) async {
     // Get the actual category from internal map
     if (!_categoriesById.containsKey(category.id)) {
@@ -352,9 +365,6 @@ class AppsService extends ChangeNotifier
         break;
       case 'Non-TV Apps':
         appsToAdd = _applications.values.where((app) => app.sideloaded && !app.hidden);
-        break;
-      case 'All Apps':
-        appsToAdd = _applications.values.where((app) => !app.hidden);
         break;
       default:
         return; // Not a special category
@@ -445,6 +455,83 @@ class AppsService extends ChangeNotifier
       ));
     }
     await _database.replaceAppsCategories(orderedAppCategories);
+    notifyListeners();
+  }
+
+  Future<void> moveAppToAdjacentCategory(App app, Category currentCategory, AxisDirection direction) async {
+    int currentSectionIndex = _launcherSections.indexOf(currentCategory);
+    if (currentSectionIndex == -1) {
+       return;
+    }
+
+    int targetSectionIndex = -1;
+    Category? targetCategory;
+
+    // Find next valid category (skip spacers)
+    if (direction == AxisDirection.down) {
+      for (int i = currentSectionIndex + 1; i < _launcherSections.length; i++) {
+        if (_launcherSections[i] is Category) {
+          targetSectionIndex = i;
+          targetCategory = _launcherSections[i] as Category;
+          break;
+        }
+      }
+    } else if (direction == AxisDirection.up) {
+      for (int i = currentSectionIndex - 1; i >= 0; i--) {
+        if (_launcherSections[i] is Category) {
+          targetSectionIndex = i;
+          targetCategory = _launcherSections[i] as Category;
+          break;
+        }
+      }
+    }
+
+    if (targetCategory == null) {
+      return;
+    }
+
+    // Remove from current
+    await removeFromCategory(app, currentCategory);
+    
+    // Set pending focus package so AppCard can reclaim focus and reorder mode
+    _pendingReorderFocusPackage = app.packageName;
+    
+    // Add to target
+    int newIndex = 0;
+    if (direction == AxisDirection.up) {
+      // If moving UP (to previous section), append to BOTTOM
+       newIndex = await _database.nextAppCategoryOrder(targetCategory.id) ?? 0;
+    } else {
+      // If moving DOWN (to next section), insert at TOP (index 0)
+      newIndex = 0;
+    }
+
+    // DB Insert Logic
+    // 1. Get current items in target
+    List<App> targetApps = targetCategory.applications;
+    
+    // 2. Adjust local list
+    if (direction == AxisDirection.down) {
+       targetApps.insert(0, app); // Insert at top
+    } else {
+       targetApps.add(app); // Insert at bottom
+    }
+    
+    // 3. Update orders for all items in target category
+    List<AppsCategoriesCompanion> orderedAppCategories = [];
+    for (int i = 0; i < targetApps.length; ++i) {
+       App a = targetApps[i];
+       a.categoryOrders[targetCategory.id] = i; // Update local map
+       orderedAppCategories.add(AppsCategoriesCompanion(
+        categoryId: Value(targetCategory.id),
+        appPackageName: Value(a.packageName),
+        order: Value(i),
+      ));
+    }
+    
+    // 4. Batch DB update
+    await _database.replaceAppsCategories(orderedAppCategories);
+    
     notifyListeners();
   }
 
@@ -604,15 +691,24 @@ class AppsService extends ChangeNotifier
     notifyListeners();
   }
 
-  Future<void> moveSection(int oldIndex, int newIndex) async {
-    List<LauncherSection> newSectionsList = List.of(_launcherSections);
-    LauncherSection sectionToMove = newSectionsList.removeAt(oldIndex);
-    newSectionsList.insert(newIndex, sectionToMove);
+  void moveSectionInMemory(int oldIndex, int newIndex) {
+    if (oldIndex < 0 || oldIndex >= _launcherSections.length ||
+        newIndex < 0 || newIndex >= _launcherSections.length) return;
+        
+    final section = _launcherSections.removeAt(oldIndex);
+    _launcherSections.insert(newIndex, section);
+    notifyListeners();
+  }
 
+  Future<void> persistSectionsOrder() async {
     List<CategoriesCompanion> orderedCategories = [];
     List<LauncherSpacersCompanion> orderedSpacers = [];
-    for (int i = 0; i < newSectionsList.length; ++i) {
-      LauncherSection section = newSectionsList[i];
+    
+    for (int i = 0; i < _launcherSections.length; ++i) {
+      LauncherSection section = _launcherSections[i];
+      // Update the order property on the object itself
+      if (section is Category) section.order = i;
+      else if (section is LauncherSpacer) section.order = i;
 
       if (section is Category) {
         orderedCategories.add(CategoriesCompanion(id: Value(section.id), order: Value(i)));
@@ -626,9 +722,11 @@ class AppsService extends ChangeNotifier
       _database.updateCategories(orderedCategories),
       _database.updateSpacers(orderedSpacers)
     ]);
+  }
 
-    _launcherSections = newSectionsList;
-    notifyListeners();
+  Future<void> moveSection(int oldIndex, int newIndex) async {
+    moveSectionInMemory(oldIndex, newIndex);
+    await persistSectionsOrder();
   }
 
   Future<void> hideApplication(App application) async {

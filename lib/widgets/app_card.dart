@@ -18,6 +18,7 @@
 
 import 'dart:async';
 
+import 'package:flauncher/actions.dart';
 import 'package:flauncher/app_image_type.dart';
 import 'package:flauncher/providers/apps_service.dart';
 import 'package:flauncher/providers/settings_service.dart';
@@ -39,6 +40,7 @@ class AppCard extends StatefulWidget
   final bool autofocus;
   final void Function(AxisDirection) onMove;
   final VoidCallback onMoveEnd;
+  final bool handleUpNavigationToSettings;
 
   const AppCard({
     super.key,
@@ -47,6 +49,7 @@ class AppCard extends StatefulWidget
     required this.autofocus,
     required this.onMove,
     required this.onMoveEnd,
+    this.handleUpNavigationToSettings = false,
   });
 
   @override
@@ -55,6 +58,7 @@ class AppCard extends StatefulWidget
 
 class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
   bool _moving = false;
+  late FocusNode _focusNode;
 
   late Future<(AppImageType, ImageProvider)> _appImageLoadFuture;
   late final AnimationController _animation = AnimationController(
@@ -69,15 +73,54 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    _focusNode = FocusNode();
+    
+
 
     FocusManager.instance.addHighlightModeListener(_focusHighlightModeChanged);
     _appImageLoadFuture = _loadAppBannerOrIcon(Provider.of<AppsService>(context, listen: false));
+
+    // Check if we need to restore focus/reorder mode after a move
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+       final appsService = Provider.of<AppsService>(context, listen: false);
+       if (appsService.pendingReorderFocusPackage == widget.application.packageName &&
+           appsService.pendingReorderFocusCategoryId == widget.category.id) {
+          appsService.clearPendingReorderFocusPackage();
+          _focusNode.requestFocus();
+          
+          setState(() {
+            _moving = true;
+          });
+       }
+    });
+  }
+
+  @override
+  void didUpdateWidget(AppCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    
+    // Check for pending focus on update as well
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+       final appsService = Provider.of<AppsService>(context, listen: false);
+       if (appsService.pendingReorderFocusPackage == widget.application.packageName &&
+           appsService.pendingReorderFocusCategoryId == widget.category.id) {
+          appsService.clearPendingReorderFocusPackage();
+          _focusNode.requestFocus();
+          
+          if (!_moving) {
+            setState(() {
+              _moving = true;
+            });
+          }
+       }
+    });
   }
 
   @override
   void dispose() {
     FocusManager.instance.removeHighlightModeListener(_focusHighlightModeChanged);
     _animation.dispose();
+    _focusNode.dispose();
 
     super.dispose();
   }
@@ -105,6 +148,7 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
                 fit: StackFit.expand,
                 children: [
                   InkWell(
+                    focusNode: _focusNode,
                     autofocus: widget.autofocus,
                     focusColor: Colors.transparent,
                     child: _appImage(),
@@ -145,21 +189,31 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
                           return AnimatedBuilder(
                             animation: _animation,
                             builder: (context, child) => IgnorePointer(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color: Colors.white.withAlpha(_animation.value.round()),
-                                    width: 3
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withAlpha((_animation.value * 0.5).round()),
-                                      blurRadius: 8,
-                                      spreadRadius: 1,
+                              child: Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: Colors.white.withAlpha(_animation.value.round()),
+                                        width: 4
+                                      ),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(3),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5),
+                                        border: Border.all(
+                                          color: Colors.black,
+                                          width: 3
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           );
@@ -167,21 +221,31 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
                           // Static border when animation is disabled
                           _animation.stop();
                           return IgnorePointer(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 3
-                                ),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black54,
-                                    blurRadius: 8,
-                                    spreadRadius: 1,
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 4
+                                    ),
                                   ),
-                                ],
-                              ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(3),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5),
+                                      border: Border.all(
+                                        color: Colors.black,
+                                        width: 3
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           );
                         }
@@ -303,20 +367,28 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
     return Matrix4.diagonal3Values(scale, scale, 1.0);
   }
 
-  List<Widget> _arrows() => [
+  List<Widget> _arrows() {
+    final arrows = <Widget>[
       _arrow(Alignment.centerLeft, Icons.keyboard_arrow_left, () {
         widget.onMove(AxisDirection.left);
       }),
-      _arrow(Alignment.topCenter, Icons.keyboard_arrow_up, () {
-        widget.onMove(AxisDirection.up);
-      }),
-      _arrow(Alignment.bottomCenter, Icons.keyboard_arrow_down, () {
-        widget.onMove(AxisDirection.down);
-      }),
       _arrow(Alignment.centerRight, Icons.keyboard_arrow_right, () {
         widget.onMove(AxisDirection.right);
-      })
-  ];
+      }),
+    ];
+    
+    // Only show Up/Down arrows for grid layouts
+    if (widget.category.type == CategoryType.grid) {
+      arrows.add(_arrow(Alignment.topCenter, Icons.keyboard_arrow_up, () {
+        widget.onMove(AxisDirection.up);
+      }));
+      arrows.add(_arrow(Alignment.bottomCenter, Icons.keyboard_arrow_down, () {
+        widget.onMove(AxisDirection.down);
+      }));
+    }
+
+    return arrows;
+  }
 
   Widget _arrow(Alignment alignment, IconData icon, VoidCallback onTap) =>
       Align(
@@ -340,17 +412,23 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
 
   KeyEventResult _onPressed(BuildContext context, LogicalKeyboardKey? key) {
     if (_moving) {
+
       WidgetsBinding.instance.addPostFrameCallback((_) => Scrollable.ensureVisible(context,
           alignment: 0.1, duration: const Duration(milliseconds: 100), curve: Curves.easeInOut));
       if (key == LogicalKeyboardKey.arrowLeft) {
+
         widget.onMove(AxisDirection.left);
       } else if (key == LogicalKeyboardKey.arrowUp) {
+
         widget.onMove(AxisDirection.up);
       } else if (key == LogicalKeyboardKey.arrowRight) {
+
         widget.onMove(AxisDirection.right);
       } else if (key == LogicalKeyboardKey.arrowDown) {
+
         widget.onMove(AxisDirection.down);
       } else if (_validationKeys.contains(key) || key == LogicalKeyboardKey.escape) {
+
         setState(() => _moving = false);
         widget.onMoveEnd();
       } else {
@@ -360,6 +438,9 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
       return KeyEventResult.handled;
     } else if (_validationKeys.contains(key)) {
       context.read<AppsService>().launchApp(widget.application);
+      return KeyEventResult.handled;
+    } else if (key == LogicalKeyboardKey.arrowUp && widget.handleUpNavigationToSettings) {
+      Actions.invoke(context, const MoveFocusToSettingsIntent());
       return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;

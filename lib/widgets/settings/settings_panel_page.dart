@@ -21,10 +21,13 @@ import 'package:flauncher/providers/settings_service.dart';
 import 'package:flauncher/widgets/ensure_visible.dart';
 import 'package:flauncher/widgets/settings/applications_panel_page.dart';
 import 'package:flauncher/widgets/settings/launcher_sections_panel_page.dart';
-import 'package:flauncher/widgets/settings/date_time_format_dialog.dart';
+import 'package:flauncher/widgets/settings/misc_panel_page.dart';
 import 'package:flauncher/widgets/settings/flauncher_about_dialog.dart';
 import 'package:flauncher/widgets/settings/status_bar_panel_page.dart';
 import 'package:flauncher/widgets/settings/wallpaper_panel_page.dart';
+import 'package:flauncher/widgets/settings/date_time_format_page.dart';
+import 'package:flauncher/widgets/settings/back_button_action_page.dart';
+import 'package:flauncher/widgets/settings/wifi_usage_period_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -33,6 +36,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../rounded_switch_list_tile.dart';
 import 'back_button_actions.dart';
+import 'focusable_settings_tile.dart';
 
 class SettingsPanelPage extends StatelessWidget {
   static const String routeName = "settings_panel";
@@ -52,127 +56,67 @@ class SettingsPanelPage extends StatelessWidget {
                 children: [
                   EnsureVisible(
                     alignment: 0.5,
-                    child: TextButton(
+                    child: FocusableSettingsTile(
                       autofocus: true,
-                      child: Row(
-                        children: [
-                          const Icon(Icons.apps),
-                          Container(width: 8),
-                          Text(localizations.applications, style: Theme.of(context).textTheme.bodyMedium),
-                        ],
-                      ),
+                      leading: const Icon(Icons.apps),
+                      title: Text(localizations.applications, style: Theme.of(context).textTheme.bodyMedium),
                       onPressed: () => Navigator.of(context).pushNamed(ApplicationsPanelPage.routeName),
                     ),
                   ),
-                  TextButton(
-                    child: Row(
-                      children: [
-                        const Icon(Icons.category),
-                        Container(width: 8),
-                        Text(localizations.launcherSections, style: Theme.of(context).textTheme.bodyMedium),
-                      ],
-                    ),
+                  FocusableSettingsTile(
+                    leading: const Icon(Icons.category),
+                    title: Text(localizations.launcherSections, style: Theme.of(context).textTheme.bodyMedium),
                     onPressed: () => Navigator.of(context).pushNamed(LauncherSectionsPanelPage.routeName),
                   ),
-                  TextButton(
-                    child: Row(
-                      children: [
-                        const Icon(Icons.wallpaper_outlined),
-                        Container(width: 8),
-                        Text(localizations.wallpaper, style: Theme.of(context).textTheme.bodyMedium),
-                      ],
-                    ),
+                  FocusableSettingsTile(
+                    leading: const Icon(Icons.wallpaper_outlined),
+                    title: Text(localizations.wallpaper, style: Theme.of(context).textTheme.bodyMedium),
                     onPressed: () => Navigator.of(context).pushNamed(WallpaperPanelPage.routeName),
                   ),
-                  TextButton(
-                    child: Row(
-                      children: [
-                        const Icon(Icons.tips_and_updates),
-                        Container(width: 8),
-                        Text(localizations.statusBar, style: Theme.of(context).textTheme.bodyMedium),
-                      ],
-                    ),
+                  FocusableSettingsTile(
+                    leading: const Icon(Icons.tips_and_updates),
+                    title: Text(localizations.statusBar, style: Theme.of(context).textTheme.bodyMedium),
                     onPressed: () => Navigator.of(context).pushNamed(StatusBarPanelPage.routeName),
                   ),
                   const Divider(),
-                  TextButton(
-                    child: Row(
-                      children: [
-                        const Icon(Icons.settings_outlined),
-                        Container(width: 8),
-                        Text(localizations.systemSettings, style: Theme.of(context).textTheme.bodyMedium),
-                      ],
-                    ),
+                  FocusableSettingsTile(
+                    leading: const Icon(Icons.settings_outlined),
+                    title: Text(localizations.systemSettings, style: Theme.of(context).textTheme.bodyMedium),
                     onPressed: () => context.read<AppsService>().openSettings(),
                   ),
-                  TextButton(
-                    child: Row(
-                      children: [
-                        const Icon(Icons.screenshot_monitor),
-                        Container(width: 8),
-                        Text('Screensaver Settings', style: Theme.of(context).textTheme.bodyMedium),
-                      ],
-                    ),
+                  FocusableSettingsTile(
+                    leading: const Icon(Icons.screenshot_monitor),
+                    title: Text('Screensaver Settings', style: Theme.of(context).textTheme.bodyMedium),
                     onPressed: () => _openScreensaverSettings(),
                   ),
-                  const Divider(),
-                  TextButton(
-                    child: Row(
-                      children: [
-                        const Icon(Icons.date_range),
-                        Container(width: 8),
-                        Text(localizations.dateAndTimeFormat, style: Theme.of(context).textTheme.bodyMedium),
-                      ],
-                    ),
-                    onPressed: () async => await _dateTimeFormatDialog(context),
+
+
+
+                  FocusableSettingsTile(
+                    leading: const Icon(Icons.date_range),
+                    title: Text(localizations.dateAndTimeFormat, style: Theme.of(context).textTheme.bodyMedium),
+                    onPressed: () => Navigator.of(context).pushNamed(DateTimeFormatPage.routeName),
                   ),
-                  TextButton(
-                    child: Row(
-                      children: [
-                        const Icon(Icons.arrow_back),
-                        Container(width: 8),
-                        Text(localizations.backButtonAction, style: Theme.of(context).textTheme.bodyMedium),
-                      ],
-                    ),
-                    onPressed: () async => await _backButtonActionDialog(context),
+                  FocusableSettingsTile(
+                    leading: const Icon(Icons.arrow_back),
+                    title: Text(localizations.backButtonAction, style: Theme.of(context).textTheme.bodyMedium),
+                    onPressed: () => Navigator.of(context).pushNamed(BackButtonActionPage.routeName),
                   ),
-                  TextButton(
-                    child: Row(
-                      children: [
-                        const Icon(Icons.wifi),
-                        Container(width: 8),
-                        Text('WiFi Usage Period', style: Theme.of(context).textTheme.bodyMedium),
-                      ],
-                    ),
-                    onPressed: () async => await _wifiUsagePeriodDialog(context),
+                  FocusableSettingsTile(
+                    leading: const Icon(Icons.wifi),
+                    title: Text('WiFi Usage Period', style: Theme.of(context).textTheme.bodyMedium),
+                    onPressed: () => Navigator.of(context).pushNamed(WifiUsagePeriodPage.routeName),
                   ),
-                  RoundedSwitchListTile(
-                    value: settingsService.appHighlightAnimationEnabled,
-                    onChanged: (value) => settingsService.setAppHighlightAnimationEnabled(value),
-                    title: Text(localizations.appCardHighlightAnimation, style: Theme.of(context).textTheme.bodyMedium),
-                    secondary: Icon(Icons.filter_center_focus),
-                  ),
-                  RoundedSwitchListTile(
-                    value: settingsService.appKeyClickEnabled,
-                    onChanged: (value) => settingsService.setAppKeyClickEnabled(value),
-                    title: Text(localizations.appKeyClick, style: Theme.of(context).textTheme.bodyMedium),
-                    secondary: Icon(Icons.notifications_active),
-                  ),
-                  RoundedSwitchListTile(
-                      value: settingsService.showCategoryTitles,
-                      onChanged: (value) => settingsService.setShowCategoryTitles(value),
-                      title: Text(localizations.showCategoryTitles, style: Theme.of(context).textTheme.bodyMedium),
-                      secondary: Icon(Icons.abc)
+// ...
+                  FocusableSettingsTile(
+                    leading: const Icon(Icons.miscellaneous_services),
+                    title: Text("Miscellaneous", style: Theme.of(context).textTheme.bodyMedium),
+                    onPressed: () => Navigator.of(context).pushNamed(MiscPanelPage.routeName),
                   ),
                   const Divider(),
-                  TextButton(
-                    child: Row(
-                      children: [
-                        const Icon(Icons.info_outline),
-                        Container(width: 8),
-                        Text(localizations.aboutFlauncher, style: Theme.of(context).textTheme.bodyMedium),
-                      ],
-                    ),
+                  FocusableSettingsTile(
+                    leading: const Icon(Icons.info_outline),
+                    title: Text(localizations.aboutFlauncher, style: Theme.of(context).textTheme.bodyMedium),
                     onPressed: () => showDialog(
                       context: context,
                       builder: (_) => FutureBuilder<PackageInfo>(
@@ -192,102 +136,10 @@ class SettingsPanelPage extends StatelessWidget {
     );
   }
 
-  Future<void> _backButtonActionDialog(BuildContext context) async {
-    AppLocalizations localizations = AppLocalizations.of(context)!;
-    SettingsService service = context.read<SettingsService>();
 
-    final newAction = await showDialog<String>(
-        context: context,
-        builder: (context) => SimpleDialog(
-            title: Text(localizations.dialogTitleBackButtonAction),
-            children: [
-              SimpleDialogOption(
-                child: Text(localizations.dialogOptionBackButtonActionDoNothing),
-                onPressed: () => Navigator.pop(context, ""),
-              ),
-              SimpleDialogOption(
-                child: Text(localizations.dialogOptionBackButtonActionShowClock),
-                onPressed: () => Navigator.pop(context, BACK_BUTTON_ACTION_CLOCK),
-              ),
-              SimpleDialogOption(
-                child: Text(localizations.dialogOptionBackButtonActionShowScreensaver),
-                onPressed: () => Navigator.pop(context, BACK_BUTTON_ACTION_SCREENSAVER),
-              )
-            ]
-        )
-    );
 
-    if (newAction != null) {
-      await service.setBackButtonAction(newAction);
-    }
-  }
-
-  Future<void> _wifiUsagePeriodDialog(BuildContext context) async {
-    SettingsService service = context.read<SettingsService>();
-    
-    final newPeriod = await showDialog<String>(
-        context: context,
-        builder: (context) => SimpleDialog(
-            title: Text('WiFi Usage Period'),
-            children: [
-              SimpleDialogOption(
-                child: Row(
-                  children: [
-                    if (service.wifiUsagePeriod == WIFI_USAGE_DAILY) Icon(Icons.check, size: 20),
-                    if (service.wifiUsagePeriod != WIFI_USAGE_DAILY) SizedBox(width: 20),
-                    SizedBox(width: 8),
-                    Text('Daily'),
-                  ],
-                ),
-                onPressed: () => Navigator.pop(context, WIFI_USAGE_DAILY),
-              ),
-              SimpleDialogOption(
-                child: Row(
-                  children: [
-                    if (service.wifiUsagePeriod == WIFI_USAGE_WEEKLY) Icon(Icons.check, size: 20),
-                    if (service.wifiUsagePeriod != WIFI_USAGE_WEEKLY) SizedBox(width: 20),
-                    SizedBox(width: 8),
-                    Text('Weekly'),
-                  ],
-                ),
-                onPressed: () => Navigator.pop(context, WIFI_USAGE_WEEKLY),
-              ),
-              SimpleDialogOption(
-                child: Row(
-                  children: [
-                    if (service.wifiUsagePeriod == WIFI_USAGE_MONTHLY) Icon(Icons.check, size: 20),
-                    if (service.wifiUsagePeriod != WIFI_USAGE_MONTHLY) SizedBox(width: 20),
-                    SizedBox(width: 8),
-                    Text('Monthly'),
-                  ],
-                ),
-                onPressed: () => Navigator.pop(context, WIFI_USAGE_MONTHLY),
-              ),
-            ]
-        )
-    );
-
-    if (newPeriod != null) {
-      await service.setWifiUsagePeriod(newPeriod);
-    }
-  }
-
-  Future<void> _dateTimeFormatDialog(BuildContext context) async {
-    SettingsService service = context.read<SettingsService>();
-
-    final formatRecord = await showDialog<(String, String)>(
-        context: context,
-        builder: (_) => DateTimeFormatDialog(service.dateFormat, service.timeFormat)
-    );
-
-    if (formatRecord != null) {
-      await service.setDateTimeFormat(formatRecord.$1, formatRecord.$2);
-    }
-  }
-
-  void _openScreensaverSettings() {
-    // Open Android screensaver settings
-    // This will show the system screensaver settings where FLauncher Clock can be selected
+  Future<void> _openScreensaverSettings() async {
+    // Open Android screensaver settings with native fallbacks
     const platform = MethodChannel('me.efesser.flauncher/method');
     platform.invokeMethod('openScreensaverSettings');
   }

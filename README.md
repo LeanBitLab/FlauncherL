@@ -19,9 +19,10 @@ This customized version introduces usability enhancements and some UX improvemen
 - **Easy WiFi Access** - Network indicator doubles as a shortcut to system WiFi settings.
 - **Quick Presets** - Select Time/Date formats and Category names from a list (No keyboard required).
 - **Pitch Black Wallpaper** - Added a true black gradient background option.
-- **Easier D-Pad Navigation** - High-contrast focus outlines for better visibility on TV.
+- **Enhanced Focus Indicator** - New double-border design ensures perfect visibility on any background.
+- **Smart Navigation** - Fixed "bounce back" issues and optimized focus traversal for a smoother experience.
+- **Refined Settings** - Reorganized menus with a new "Miscellaneous" section and unified focus styles.
 - **New Categories** - Added "All Apps" and "Favorites" with auto-population support.
-- **UI Refinement** - Polished interface with cleaner typography and unified terminology.
 - **Optimizations** - Improved performance with aggressive icon caching and code cleanups.
 
 

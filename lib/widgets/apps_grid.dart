@@ -33,10 +33,13 @@ class AppsGrid extends StatelessWidget
   final Category category;
   final List<App> applications;
 
+  final bool isFirstSection;
+
   AppsGrid({
     Key? key,
     required this.category,
     required this.applications,
+    this.isFirstSection = false,
   }) : super(key: key);
 
   @override
@@ -59,6 +62,7 @@ class AppsGrid extends StatelessWidget
               category: category,
               application: applications[index],
               autofocus: index == 0,
+              handleUpNavigationToSettings: isFirstSection && index < category.columnsCount,
               onMove: (direction) => _onMove(context, direction, index),
               onMoveEnd: () => _saveOrder(context)
           )
@@ -92,8 +96,12 @@ class AppsGrid extends StatelessWidget
     );
   }
 
-  int _findChildIndex(Key key) =>
-      applications.indexWhere((app) => app.packageName == (key as ValueKey<String>).value);
+
+  int? _findChildIndex(Key key) {
+    final valueKey = key as ValueKey<String>;
+    final index = applications.indexWhere((app) => app.packageName == valueKey.value);
+    return index >= 0 ? index : null;
+  }
 
   void _onMove(BuildContext context, AxisDirection direction, int index) {
     final currentRow = (index / category.columnsCount).floor();
@@ -105,6 +113,7 @@ class AppsGrid extends StatelessWidget
         if (currentRow > 0) {
           newIndex = index - category.columnsCount;
         }
+        // At top boundary - do nothing
         break;
       case AxisDirection.right:
         if (index < applications.length - 1) {
@@ -115,6 +124,7 @@ class AppsGrid extends StatelessWidget
         if (currentRow < totalRows) {
           newIndex = min(index + category.columnsCount, applications.length - 1);
         }
+        // At bottom boundary - do nothing
         break;
       case AxisDirection.left:
         if (index > 0) {
@@ -124,7 +134,12 @@ class AppsGrid extends StatelessWidget
     }
     if (newIndex != null) {
       final appsService = context.read<AppsService>();
+      final movingApp = applications[index];
+      
       appsService.reorderApplication(category, index, newIndex);
+      
+      // Set pending focus so the app at the new position will request focus
+      appsService.setPendingReorderFocus(movingApp.packageName, category.id);
     }
   }
 

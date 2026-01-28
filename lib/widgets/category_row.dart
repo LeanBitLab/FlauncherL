@@ -31,10 +31,13 @@ class CategoryRow extends StatelessWidget
   final Category category;
   final List<App> applications;
 
+  final bool isFirstSection;
+
   CategoryRow({
     Key? key,
     required this.category,
     required this.applications,
+    this.isFirstSection = false,
   }) : super(key: key);
 
   @override
@@ -59,6 +62,7 @@ class CategoryRow extends StatelessWidget
                   category: category,
                   application: applications[index],
                   autofocus: index == 0,
+                  handleUpNavigationToSettings: isFirstSection,
                   onMove: (direction) => _onMove(context, direction, index),
                   onMoveEnd: () => _onMoveEnd(context)
                 )
@@ -105,11 +109,16 @@ class CategoryRow extends StatelessWidget
     } else if (direction == AxisDirection.left && index > 0) {
       newIndex = index - 1;
     } else {
+      // Ignore UP/DOWN or at boundaries
       return;
     }
 
     final appsService = context.read<AppsService>();
+    final movingApp = applications[index];
     appsService.reorderApplication(category, index, newIndex);
+    
+    // Set pending focus so the app at the new position will request focus
+    appsService.setPendingReorderFocus(movingApp.packageName, category.id);
   }
 
   void _onMoveEnd(BuildContext context) {

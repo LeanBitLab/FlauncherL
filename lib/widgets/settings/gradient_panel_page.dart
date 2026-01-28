@@ -37,48 +37,54 @@ class GradientPanelPage extends StatelessWidget {
               mainAxisSpacing: 8,
               crossAxisSpacing: 8,
               children: FLauncherGradients.all
-                  .map((gradient) => EnsureVisible(alignment: 0.5, child: _gradientCard(gradient)))
+                  .map((gradient) => EnsureVisible(alignment: 0.5, child: _gradientCard(context, gradient)))
                   .toList(),
             ),
           ),
         ],
       );
 
-  Widget _gradientCard(FLauncherGradient fLauncherGradient) => Focus(
-        key: Key("gradient-${fLauncherGradient.uuid}"),
-        canRequestFocus: false,
-        child: Builder(
-          builder: (context) => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Card(
-                  clipBehavior: Clip.antiAlias,
-                  shape: _cardBorder(Focus.of(context).hasFocus),
-                  child: InkWell(
-                    autofocus: fLauncherGradient == FLauncherGradients.greatWhale,
-                    onTap: () => context.read<WallpaperService>().setGradient(fLauncherGradient),
-                    child: Container(decoration: BoxDecoration(gradient: fLauncherGradient.gradient)),
+  Widget _gradientCard(BuildContext context, FLauncherGradient fLauncherGradient) => Actions(
+        actions: <Type, Action<Intent>>{
+          ActivateIntent: CallbackAction<ActivateIntent>(onInvoke: (_) => context.read<WallpaperService>().setGradient(fLauncherGradient)),
+          ButtonActivateIntent: CallbackAction<ButtonActivateIntent>(onInvoke: (_) => context.read<WallpaperService>().setGradient(fLauncherGradient)),
+        },
+        child: Focus(
+          key: Key("gradient-${fLauncherGradient.uuid}"),
+          canRequestFocus: false,
+          child: Builder(
+            builder: (context) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Card(
+                    clipBehavior: Clip.antiAlias,
+                    shape: _cardBorder(Focus.of(context).hasFocus),
+                    child: InkWell(
+                      autofocus: fLauncherGradient == FLauncherGradients.greatWhale,
+                      onTap: () => context.read<WallpaperService>().setGradient(fLauncherGradient),
+                      child: Container(decoration: BoxDecoration(gradient: fLauncherGradient.gradient)),
+                    ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: AnimatedDefaultTextStyle(
-                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                        decoration: TextDecoration.underline,
-                        color: Focus.of(context).hasFocus ? Colors.white : null,
-                      ),
-                  duration: const Duration(milliseconds: 150),
-                  child: Text(fLauncherGradient.name, overflow: TextOverflow.ellipsis),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: AnimatedDefaultTextStyle(
+                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                          decoration: TextDecoration.underline,
+                          color: Focus.of(context).hasFocus ? Colors.white : null,
+                        ),
+                    duration: const Duration(milliseconds: 150),
+                    child: Text(fLauncherGradient.name, overflow: TextOverflow.ellipsis),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       );
 
   ShapeBorder? _cardBorder(bool hasFocus) => hasFocus
-      ? RoundedRectangleBorder(side: const BorderSide(color: Colors.white, width: 2), borderRadius: BorderRadius.circular(4))
-      : null;
+      ? RoundedRectangleBorder(side: const BorderSide(color: Colors.white, width: 2), borderRadius: BorderRadius.circular(12))
+      : RoundedRectangleBorder(borderRadius: BorderRadius.circular(12));
 }

@@ -590,7 +590,14 @@ public class MainActivity extends FlutterActivity {
             return true;
         }
 
-        // 3. Final fallback - open main settings
+        // 3. FALLBACK: Try Display Settings (often contains screensaver on newer
+        // Android TV/Google TV)
+        Intent displayIntent = new Intent(Settings.ACTION_DISPLAY_SETTINGS);
+        if (tryStartActivity(displayIntent)) {
+            return true;
+        }
+
+        // 4. Final fallback - open main settings
         return launchActivityFromAction(Settings.ACTION_SETTINGS);
     }
 

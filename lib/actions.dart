@@ -65,6 +65,10 @@ class BackAction extends Action<BackIntent> {
   }
 }
 
+class MoveFocusToSettingsIntent extends Intent {
+  const MoveFocusToSettingsIntent();
+}
+
 class BackIntent extends Intent {
   const BackIntent();
 }

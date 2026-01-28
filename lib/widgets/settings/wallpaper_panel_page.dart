@@ -17,6 +17,7 @@
  */
 
 import 'package:flauncher/providers/wallpaper_service.dart';
+import 'package:flauncher/widgets/settings/focusable_settings_tile.dart';
 import 'package:flauncher/widgets/settings/gradient_panel_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -33,25 +34,15 @@ class WallpaperPanelPage extends StatelessWidget {
         children: [
           Text(localizations.wallpaper, style: Theme.of(context).textTheme.titleLarge),
           Divider(),
-          TextButton(
+          FocusableSettingsTile(
             autofocus: true,
-            child: Row(
-              children: [
-                Icon(Icons.gradient),
-                Container(width: 8),
-                Text(localizations.gradient, style: Theme.of(context).textTheme.bodyMedium),
-              ],
-            ),
+            leading: Icon(Icons.gradient),
+            title: Text(localizations.gradient, style: Theme.of(context).textTheme.bodyMedium),
             onPressed: () => Navigator.of(context).pushNamed(GradientPanelPage.routeName),
           ),
-          TextButton(
-            child: Row(
-              children: [
-                Icon(Icons.insert_drive_file_outlined),
-                Container(width: 8),
-                Text(localizations.picture, style: Theme.of(context).textTheme.bodyMedium),
-              ],
-            ),
+          FocusableSettingsTile(
+            leading: Icon(Icons.insert_drive_file_outlined),
+            title: Text(localizations.picture, style: Theme.of(context).textTheme.bodyMedium),
             onPressed: () async {
               try {
                 await context.read<WallpaperService>().pickWallpaper();

@@ -83,7 +83,7 @@
     "showCategoryTitles": "Show category titles",
     "sort": "Sort",
     "systemSettings": "System settings",
-    "textAboutDialog": "FlauncherL is a customized fork of FLauncher, developed by LeanBitLab.\n\nFLauncher is an open-source alternative launcher for Android TV.\nSource code available at {repoUrl}.\n\nLogo by Katie (@fureturoe), design by @FXCostanzo.",
+    "textAboutDialog": "FlauncherL is a customized open-source launcher for Android TV, based on FLauncher.\n\nDeveloped by LeanBitLab.\nSource code available at {repoUrl}.\n\nLogo by Katie (@fureturoe), design by @FXCostanzo.",
     "@textAboutDialog": {
         "placeholders": {
             "repoUrl": {

@@ -17,6 +17,7 @@
  */
 
 
+import 'package:flauncher/actions.dart';
 import 'package:flauncher/custom_traversal_policy.dart';
 import 'package:flauncher/providers/apps_service.dart';
 import 'package:flauncher/providers/launcher_state.dart';
@@ -31,78 +32,107 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'models/category.dart';
 
-class FLauncher extends StatelessWidget {
-  const FLauncher();
+class FLauncher extends StatefulWidget {
+  const FLauncher({super.key});
 
   @override
-  Widget build(BuildContext context) => FocusTraversalGroup(
-    policy: RowByRowTraversalPolicy(),
-    child: Stack(
-      children: [
-        Consumer<WallpaperService>(
-          builder: (_, wallpaperService, __) => _wallpaper(context, wallpaperService)
-        ),
-        Consumer<LauncherState>(
-          builder: (_, state, child) => Visibility(
-            child: child!,
-            replacement: const Center(
-              child: AlternativeLauncherView()
-            ),
-            visible: state.launcherVisible
+  State<FLauncher> createState() => _FLauncherState();
+}
+
+class _FLauncherState extends State<FLauncher> {
+  final GlobalKey<FocusAwareAppBarState> _appBarKey = GlobalKey();
+
+  @override
+  Widget build(BuildContext context) => Actions(
+    actions: <Type, Action<Intent>>{
+      MoveFocusToSettingsIntent: CallbackAction<MoveFocusToSettingsIntent>(
+        onInvoke: (_) => _appBarKey.currentState?.focusSettings(),
+      ),
+    },
+    child: FocusTraversalGroup(
+      policy: RowByRowTraversalPolicy(),
+      child: Stack(
+        children: [
+          Consumer<WallpaperService>(
+            builder: (_, wallpaperService, __) => _wallpaper(context, wallpaperService)
           ),
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            appBar: FocusAwareAppBar(),
-            body: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-              child: Consumer<AppsService>(
-                builder: (context, appsService, _) {
-                  if (appsService.initialized) {
-                    return SingleChildScrollView(child: _sections(appsService.launcherSections));
+          Consumer<LauncherState>(
+            builder: (_, state, child) => Visibility(
+              child: child!,
+              replacement: const Center(
+                child: AlternativeLauncherView()
+              ),
+              visible: state.launcherVisible
+            ),
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              appBar: FocusAwareAppBar(key: _appBarKey),
+              body: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: Consumer<AppsService>(
+                  builder: (context, appsService, _) {
+                    if (appsService.initialized) {
+                      return SingleChildScrollView(child: _sections(appsService.launcherSections));
+                    }
+                    else {
+                      return _emptyState(context);
+                    }
                   }
-                  else {
-                    return _emptyState(context);
-                  }
-                }
+                )
               )
             )
           )
-        )
-      ]
-    )
+        ]
+      )
+    ),
   );
 
-  Widget _sections(List<LauncherSection> sections) => Column(
-    children: sections.map((section) {
+  Widget _sections(List<LauncherSection> sections) {
+    List<Widget> children = [];
+    bool firstCategoryFound = false;
+
+    for (var section in sections) {
       final Key sectionKey = Key(section.id.toString());
-      final Widget categoryWidget;
 
       if (section is LauncherSpacer) {
-        return SizedBox(key: sectionKey, height: section.height.toDouble());
+        children.add(SizedBox(key: sectionKey, height: section.height.toDouble()));
+        continue;
       }
 
       Category category = section as Category;
+      Widget categoryWidget;
+
+      // Pass isFirstSection only to the first category found
+      bool isFirstSection = !firstCategoryFound;
+      if (isFirstSection) firstCategoryFound = true;
+
       switch (category.type) {
         case CategoryType.row:
           categoryWidget = CategoryRow(
               key: sectionKey,
               category: category,
-              applications: category.applications
+              applications: category.applications,
+              isFirstSection: isFirstSection
           );
+          break; // Added break
         case CategoryType.grid:
           categoryWidget = AppsGrid(
               key: sectionKey,
               category: category,
-              applications: category.applications
+              applications: category.applications,
+              isFirstSection: isFirstSection
           );
+          break; // Added break
       }
 
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: categoryWidget
-      );
-    }).toList(),
-  );
+      children.add(Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: categoryWidget
+      ));
+    }
+
+    return Column(children: children);
+  }
 
   Widget _wallpaper(BuildContext context, WallpaperService wallpaperService) {
     if (wallpaperService.wallpaper != null) {

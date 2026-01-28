@@ -27,11 +27,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../models/category.dart';
 
 // Section name presets for TV remote-friendly selection
-// First 3 are special auto-populating categories
+// First 2 are special auto-populating categories
 const List<String> sectionNamePresets = [
   'TV Apps',             // Auto: non-sideloaded apps
   'Non-TV Apps',         // Auto: sideloaded apps
-  'All Apps',            // Auto: all non-hidden apps
   'Movies & Shows',
   'Music',
   'Games',
@@ -189,13 +188,19 @@ class LauncherSectionPanelPage extends StatelessWidget
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
+
                       if (creating)
                         _listTile(
                             context,
                             Text(localizations.type),
                             Padding(
                               padding: EdgeInsets.only(top: 4),
-                              child: DropdownButton<LauncherSectionType>(
+                              child: DropdownButtonFormField<LauncherSectionType>(
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white, width: 2)),
+                                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                ),
                                 autofocus: true,
                                 value: sectionType,
                                 onChanged: (value) {
@@ -226,7 +231,7 @@ class LauncherSectionPanelPage extends StatelessWidget
               Selector<_SettingsState, bool>(
                 selector: (context, state) => (state.valid && state.changed),
                 builder: (context, canSave, _) {
-                  void Function()? onSavePressed = null;
+                  void Function()? onSavePressed;
                   if (canSave) {
                     onSavePressed = () {
                       if (state.onSave != null) {
@@ -237,19 +242,34 @@ class LauncherSectionPanelPage extends StatelessWidget
 
                   return Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: ElevatedButton(
+                    child: FilledButton(
                       style: ButtonStyle(
-                        backgroundColor: WidgetStatePropertyAll(Colors.greenAccent[700]),
-                        foregroundColor: WidgetStatePropertyAll(Colors.white),
-                        side: WidgetStateProperty.resolveWith((states) {
-                          if (states.contains(WidgetState.focused)) {
-                            return BorderSide(color: Colors.white, width: 3);
+                        backgroundColor: MaterialStateProperty.resolveWith((states) {
+                          if (states.contains(MaterialState.disabled)) {
+                            return Colors.white10;
+                          }
+                          return Color(0xFF6366F1); // Indigo (Modern Primary)
+                        }),
+                        foregroundColor: MaterialStateProperty.resolveWith((states) {
+                           if (states.contains(MaterialState.disabled)) {
+                             return Colors.white38;
+                           }
+                           return Colors.white;
+                        }),
+                        shape: MaterialStatePropertyAll(
+                          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))
+                        ),
+                        side: MaterialStateProperty.resolveWith((states) {
+                          if (states.contains(MaterialState.focused)) {
+                            return BorderSide(color: Colors.white, width: 2);
                           }
                           return null;
                         }),
+                        elevation: MaterialStatePropertyAll(0),
+                        padding: MaterialStatePropertyAll(EdgeInsets.symmetric(vertical: 12))
                       ),
+                      onPressed: onSavePressed,
                       child: Text(localizations.save),
-                      onPressed: onSavePressed
                     )
                   );
                 }
@@ -257,24 +277,29 @@ class LauncherSectionPanelPage extends StatelessWidget
 
               if (!creating)
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: ElevatedButton(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: FilledButton(
                     style: ButtonStyle(
-                      backgroundColor: WidgetStatePropertyAll(Colors.red[400]),
-                      foregroundColor: WidgetStatePropertyAll(Colors.white),
-                      side: WidgetStateProperty.resolveWith((states) {
-                        if (states.contains(WidgetState.focused)) {
-                          return BorderSide(color: Colors.white, width: 3);
+                      backgroundColor: MaterialStatePropertyAll(Color(0xFF27272A)), // Zinc 800
+                      foregroundColor: MaterialStatePropertyAll(Color(0xFFEF4444)), // Red 500
+                      shape: MaterialStatePropertyAll(
+                          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))
+                      ),
+                      side: MaterialStateProperty.resolveWith((states) {
+                        if (states.contains(MaterialState.focused)) {
+                          return BorderSide(color: Colors.white, width: 2);
                         }
                         return null;
                       }),
+                      elevation: MaterialStatePropertyAll(0),
+                      padding: MaterialStatePropertyAll(EdgeInsets.symmetric(vertical: 12))
                     ),
-                    child: Text(localizations.delete),
                     onPressed: () async {
                       state.setDeleted();
                       await context.read<AppsService>().deleteSection(sectionIndex!);
                       Navigator.of(context).pop();
-                    }
+                    },
+                    child: Text(localizations.delete),
                   )
                 )
             ]
@@ -389,7 +414,12 @@ class _CategorySettingsState extends State<_CategorySettings>
           Text(localizations.name),
           Padding(
             padding: EdgeInsets.only(top: 4),
-            child: DropdownButton<String>(
+            child: DropdownButtonFormField<String>(
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white, width: 2)),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              ),
               autofocus: _creating,
               isDense: true,
               isExpanded: true,
@@ -414,7 +444,12 @@ class _CategorySettingsState extends State<_CategorySettings>
           Text(localizations.sort),
           Padding(
             padding: EdgeInsets.only(top: 4),
-            child: DropdownButton<CategorySort>(
+            child: DropdownButtonFormField<CategorySort>(
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white, width: 2)),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              ),
               isDense: true,
               isExpanded: true,
               value: _categorySort,
@@ -442,7 +477,12 @@ class _CategorySettingsState extends State<_CategorySettings>
           Text(localizations.layout),
           Padding(
             padding: EdgeInsets.only(top: 4),
-            child: DropdownButton<CategoryType>(
+            child: DropdownButtonFormField<CategoryType>(
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white, width: 2)),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              ),
               value: _categoryType,
               onChanged: (value) {
                 setState(() {
@@ -471,7 +511,12 @@ class _CategorySettingsState extends State<_CategorySettings>
             Text(localizations.columnCount),
             Padding(
               padding: EdgeInsets.only(top: 4),
-              child: DropdownButton<int>(
+              child: DropdownButtonFormField<int>(
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white, width: 2)),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
                 value: _columnsCount,
                 isDense: true,
                 isExpanded: true,
@@ -497,7 +542,12 @@ class _CategorySettingsState extends State<_CategorySettings>
             Text(localizations.rowHeight),
             Padding(
               padding: EdgeInsets.only(top: 4),
-              child: DropdownButton<int>(
+              child: DropdownButtonFormField<int>(
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white, width: 2)),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
                 value: _rowHeight,
                 isDense: true,
                 isExpanded: true,
@@ -554,7 +604,7 @@ class _CategorySettingsState extends State<_CategorySettings>
       );
 
       // Auto-populate special categories
-      if (_name == 'TV Apps' || _name == 'Non-TV Apps' || _name == 'All Apps') {
+      if (_name == 'TV Apps' || _name == 'Non-TV Apps') {
         try {
           // Find the actual category object using the ID we just got
           final createdCategory = service.categories.firstWhere((c) => c.id == categoryId);
@@ -596,22 +646,16 @@ class _LauncherSpacerSettings extends StatefulWidget
 
 class _LauncherSpacerSettingsState extends State<_LauncherSpacerSettings>
 {
-  final FocusNode _textFieldFocusNode;
-
-  late final TextEditingController _valueController;
-
-  bool _ignoreTextFieldKeyEvent;
-  bool _valid;
-
-  int? _numberValue;
+  int _numberValue;
   LauncherSpacer? _spacer;
 
   late bool _creating;
+  
+  // Need preset values for the dropdown
+  final List<int> _spacerHeightPresets = [10, 20, 30, 40, 50, 75, 100, 150];
 
   _LauncherSpacerSettingsState():
-        _valid = true,
-        _ignoreTextFieldKeyEvent = false,
-        _textFieldFocusNode = FocusNode();
+    _numberValue = 10;
 
   @override
   void initState() {
@@ -626,42 +670,14 @@ class _LauncherSpacerSettingsState extends State<_LauncherSpacerSettings>
     }
 
     _numberValue = height;
-    _valueController = TextEditingController(text: height.toString());
+    
+    // Ensure the current value is in our presets, if not add it
+    if (!_spacerHeightPresets.contains(_numberValue)) {
+      _spacerHeightPresets.add(_numberValue);
+      _spacerHeightPresets.sort();
+    }
+    
     context.read<_SettingsState>().onSave = _save;
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    final scope = FocusScope.of(context);
-    scope.onKeyEvent = (node, keyEvent) {
-      if (_textFieldFocusNode.hasFocus && (keyEvent.logicalKey == LogicalKeyboardKey.arrowUp || keyEvent.logicalKey == LogicalKeyboardKey.arrowDown)) {
-        if (!_ignoreTextFieldKeyEvent) {
-          if (keyEvent.logicalKey == LogicalKeyboardKey.arrowUp) {
-            _textFieldFocusNode.previousFocus();
-          }
-          if (keyEvent.logicalKey == LogicalKeyboardKey.arrowDown) {
-            _textFieldFocusNode.nextFocus();
-          }
-        }
-
-        _ignoreTextFieldKeyEvent = false;
-      }
-      else {
-        _ignoreTextFieldKeyEvent = true;
-      }
-
-      return KeyEventResult.ignored;
-    };
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-
-    _valueController.dispose();
-    _textFieldFocusNode.dispose();
   }
 
   @override
@@ -673,29 +689,27 @@ class _LauncherSpacerSettingsState extends State<_LauncherSpacerSettings>
       Text(localizations.height),
       Padding(
         padding: EdgeInsets.only(top: 4),
-        child: TextFormField(
-          autovalidateMode: AutovalidateMode.always,
-          controller: _valueController,
-          focusNode: _textFieldFocusNode,
-          keyboardType: TextInputType.numberWithOptions(),
-          textCapitalization: TextCapitalization.sentences,
+        child: DropdownButtonFormField<int>(
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+            focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white, width: 2)),
+            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          ),
+          isDense: true,
+          isExpanded: true,
+          value: _numberValue,
           onChanged: (value) {
-            _numberValue = int.tryParse(value);
-            _valid = _numberValue != null && _numberValue! > 0 && _numberValue! < 500;
-
+            setState(() {
+              _numberValue = value!;
+            });
             _notifyChange();
           },
-          validator: (value) {
-            if (value!.isEmpty) {
-              return localizations.mustNotBeEmpty;
-            }
-
-            if (!_valid) {
-              return localizations.spacerMaxHeightRequirement;
-            }
-
-            return null;
-          }
+          items: _spacerHeightPresets.map((height) {
+            return DropdownMenuItem<int>(
+              value: height,
+              child: Text(height.toString(), style: Theme.of(context).textTheme.bodySmall),
+            );
+          }).toList(),
         )
       )
     );
@@ -703,15 +717,14 @@ class _LauncherSpacerSettingsState extends State<_LauncherSpacerSettings>
 
   void _notifyChange()
   {
-    context.read<_SettingsState>().setFlags(_valid, _numberValue != _spacer?.height);
+    context.read<_SettingsState>().setFlags(true, _numberValue != _spacer?.height);
   }
 
   Future<void> _save() async
   {
     AppsService service = context.read();
-    assert(_numberValue != null);
     if (_creating) {
-      await service.addSpacer(_numberValue!);
+      await service.addSpacer(_numberValue);
 
       _SettingsState state = context.read();
       int index = service.launcherSections.length - 1;
@@ -719,7 +732,7 @@ class _LauncherSpacerSettingsState extends State<_LauncherSpacerSettings>
     }
     else {
       assert(_spacer != null);
-      await service.updateSpacerHeight(_spacer!, _numberValue!);
+      await service.updateSpacerHeight(_spacer!, _numberValue);
 
       _notifyChange();
     }

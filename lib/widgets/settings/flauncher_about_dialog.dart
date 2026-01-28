@@ -34,12 +34,12 @@ class FLauncherAboutDialog extends StatelessWidget {
 
     return AboutDialog(
       applicationName: "FlauncherL",
-      applicationVersion: "${packageInfo.version} (${packageInfo.buildNumber})",
+      applicationVersion: "v${packageInfo.version} (${packageInfo.buildNumber})",
       applicationIcon: Image.asset("assets/logo.png", height: 72),
-      applicationLegalese: "© 2024 Oscar Rojas",
+      applicationLegalese: "© 2021 Étienne Fesser, 2024 Oscar Rojas\nModified by LeanBitLab",
       children: [
         SizedBox(height: 24),
-        Text(localizations.textAboutDialog("https://github.com/osrosal/flauncher"))
+        Text(localizations.textAboutDialog("https://github.com/LeanBitLab/FlauncherL"))
       ],
     );
   }
