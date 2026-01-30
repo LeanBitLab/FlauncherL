@@ -22,7 +22,7 @@ This customized version introduces usability enhancements and some UX improvemen
 - **Enhanced Focus Indicator** - New double-border design ensures perfect visibility on any background.
 - **Smart Navigation** - Fixed "bounce back" issues and optimized focus traversal for a smoother experience.
 - **Refined Settings** - Reorganized menus with a new "Miscellaneous" section and unified focus styles.
-- **New Categories** - Added "All Apps" and "Favorites" with auto-population support.
+- **New Categories** - Added "Favorites" with add from home support.
 - **Optimizations** - Improved performance with aggressive icon caching and code cleanups.
 
 
