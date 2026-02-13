@@ -5,6 +5,6 @@
     .purple { fill: #7C4DFF; }
   </style>
   <text x="50%" y="65%" dominant-baseline="middle" text-anchor="middle" class="text">
-    <tspan class="dark">LTvLauncher</tspan>
+    <tspan class="purple">LTv</tspan><tspan class="dark">Launcher</tspan>
   </text>
 </svg>
