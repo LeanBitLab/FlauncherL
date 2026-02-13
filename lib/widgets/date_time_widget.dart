@@ -22,15 +22,19 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import 'animated_character.dart';
+
 class DateTimeWidget extends StatefulWidget {
   final Duration?   updateInterval;
   final String      _dateTimeFormatString;
   final TextStyle?  textStyle;
+  final bool        animate;
 
   const DateTimeWidget(String dateTimeFormatString, {
     super.key,
     this.updateInterval,
-    this.textStyle
+    this.textStyle,
+    this.animate = true,
   }) :
       _dateTimeFormatString = dateTimeFormatString;
 
@@ -72,9 +76,18 @@ class _DateTimeWidgetState extends State<DateTimeWidget> {
   }
 
   @override
-  Widget build(BuildContext context) => Text(_dateFormat.format(_now),
-      style: widget.textStyle
-  );
+  Widget build(BuildContext context) {
+    final formattedText = _dateFormat.format(_now);
+    
+    if (widget.animate) {
+      return AnimatedTimeDisplay(
+        displayText: formattedText,
+        textStyle: widget.textStyle,
+      );
+    }
+    
+    return Text(formattedText, style: widget.textStyle);
+  }
 
   void _refreshTime() {
     setState(() {

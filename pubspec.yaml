@@ -1,7 +1,7 @@
 name: flauncher
 description: Flutter-based Android TV launcher.
 
-version: 2026.01.001+1
+version: 3.0.0+18
 
 environment:
   sdk: ">=3.4.3"
@@ -20,6 +20,8 @@ dependencies:
   package_info_plus: ^7.0.0
   provider: ^6.0.5
   shared_preferences: ^2.3.3
+  google_fonts: ^6.2.1
+  screen_brightness: ^1.0.1
   sqlite3_flutter_libs: ^0.5.13
   flutter_localizations:
     sdk: flutter
@@ -46,8 +48,8 @@ flutter_icons:
   ios: false
   min_sdk_android: 21
   image_path: "assets/icon.png"
-  adaptive_icon_background: "#1A1A1A"
-  adaptive_icon_foreground: "assets/icon_padded.png"
+  adaptive_icon_background: "#000000"
+  adaptive_icon_foreground: "assets/icon.png"
 flutter:
   generate: true
   uses-material-design: true

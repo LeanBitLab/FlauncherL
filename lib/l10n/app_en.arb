@@ -1,5 +1,5 @@
 {
-    "aboutFlauncher": "About FlauncherL",
+    "aboutFlauncher": "About LTvLauncher",
     "addCategory": "Add category",
     "addSection": "Add section",
     "alphabetical": "Alphabetical",
@@ -83,7 +83,7 @@
     "showCategoryTitles": "Show category titles",
     "sort": "Sort",
     "systemSettings": "System settings",
-    "textAboutDialog": "FlauncherL is a customized open-source launcher for Android TV, based on FLauncher.\n\nDeveloped by LeanBitLab.\nSource code available at {repoUrl}.\n\nLogo by Katie (@fureturoe), design by @FXCostanzo.",
+    "textAboutDialog": "LTvLauncher is a customized open-source launcher for Android TV, based on FLauncher.\n\nDeveloped by LeanBitLab.\nSource code available at {repoUrl}.",
     "@textAboutDialog": {
         "placeholders": {
             "repoUrl": {

@@ -17,25 +17,15 @@
  */
 
 import 'package:flauncher/providers/apps_service.dart';
-import 'package:flauncher/providers/settings_service.dart';
-import 'package:flauncher/widgets/ensure_visible.dart';
 import 'package:flauncher/widgets/settings/applications_panel_page.dart';
-import 'package:flauncher/widgets/settings/launcher_sections_panel_page.dart';
-import 'package:flauncher/widgets/settings/misc_panel_page.dart';
 import 'package:flauncher/widgets/settings/flauncher_about_dialog.dart';
-import 'package:flauncher/widgets/settings/status_bar_panel_page.dart';
-import 'package:flauncher/widgets/settings/wallpaper_panel_page.dart';
-import 'package:flauncher/widgets/settings/date_time_format_page.dart';
-import 'package:flauncher/widgets/settings/back_button_action_page.dart';
-import 'package:flauncher/widgets/settings/wifi_usage_period_page.dart';
+import 'package:flauncher/widgets/settings/interface_settings_page.dart';
+import 'package:flauncher/widgets/settings/general_settings_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../rounded_switch_list_tile.dart';
-import 'back_button_actions.dart';
 import 'focusable_settings_tile.dart';
 
 class SettingsPanelPage extends StatelessWidget {
@@ -45,102 +35,54 @@ class SettingsPanelPage extends StatelessWidget {
   Widget build(BuildContext context) {
     AppLocalizations localizations = AppLocalizations.of(context)!;
 
-    return Consumer<SettingsService>(
-      builder: (context, settingsService, __) => Column(
-        children: [
-          Text(localizations.settings, style: Theme.of(context).textTheme.titleLarge),
-          const Divider(),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  EnsureVisible(
-                    alignment: 0.5,
-                    child: FocusableSettingsTile(
-                      autofocus: true,
-                      leading: const Icon(Icons.apps),
-                      title: Text(localizations.applications, style: Theme.of(context).textTheme.bodyMedium),
-                      onPressed: () => Navigator.of(context).pushNamed(ApplicationsPanelPage.routeName),
-                    ),
-                  ),
-                  FocusableSettingsTile(
-                    leading: const Icon(Icons.category),
-                    title: Text(localizations.launcherSections, style: Theme.of(context).textTheme.bodyMedium),
-                    onPressed: () => Navigator.of(context).pushNamed(LauncherSectionsPanelPage.routeName),
-                  ),
-                  FocusableSettingsTile(
-                    leading: const Icon(Icons.wallpaper_outlined),
-                    title: Text(localizations.wallpaper, style: Theme.of(context).textTheme.bodyMedium),
-                    onPressed: () => Navigator.of(context).pushNamed(WallpaperPanelPage.routeName),
-                  ),
-                  FocusableSettingsTile(
-                    leading: const Icon(Icons.tips_and_updates),
-                    title: Text(localizations.statusBar, style: Theme.of(context).textTheme.bodyMedium),
-                    onPressed: () => Navigator.of(context).pushNamed(StatusBarPanelPage.routeName),
-                  ),
-                  const Divider(),
-                  FocusableSettingsTile(
-                    leading: const Icon(Icons.settings_outlined),
-                    title: Text(localizations.systemSettings, style: Theme.of(context).textTheme.bodyMedium),
-                    onPressed: () => context.read<AppsService>().openSettings(),
-                  ),
-                  FocusableSettingsTile(
-                    leading: const Icon(Icons.screenshot_monitor),
-                    title: Text('Screensaver Settings', style: Theme.of(context).textTheme.bodyMedium),
-                    onPressed: () => _openScreensaverSettings(),
-                  ),
-
-
-
-                  FocusableSettingsTile(
-                    leading: const Icon(Icons.date_range),
-                    title: Text(localizations.dateAndTimeFormat, style: Theme.of(context).textTheme.bodyMedium),
-                    onPressed: () => Navigator.of(context).pushNamed(DateTimeFormatPage.routeName),
-                  ),
-                  FocusableSettingsTile(
-                    leading: const Icon(Icons.arrow_back),
-                    title: Text(localizations.backButtonAction, style: Theme.of(context).textTheme.bodyMedium),
-                    onPressed: () => Navigator.of(context).pushNamed(BackButtonActionPage.routeName),
-                  ),
-                  FocusableSettingsTile(
-                    leading: const Icon(Icons.wifi),
-                    title: Text('WiFi Usage Period', style: Theme.of(context).textTheme.bodyMedium),
-                    onPressed: () => Navigator.of(context).pushNamed(WifiUsagePeriodPage.routeName),
-                  ),
-// ...
-                  FocusableSettingsTile(
-                    leading: const Icon(Icons.miscellaneous_services),
-                    title: Text("Miscellaneous", style: Theme.of(context).textTheme.bodyMedium),
-                    onPressed: () => Navigator.of(context).pushNamed(MiscPanelPage.routeName),
-                  ),
-                  const Divider(),
-                  FocusableSettingsTile(
-                    leading: const Icon(Icons.info_outline),
-                    title: Text(localizations.aboutFlauncher, style: Theme.of(context).textTheme.bodyMedium),
-                    onPressed: () => showDialog(
-                      context: context,
-                      builder: (_) => FutureBuilder<PackageInfo>(
-                        future: PackageInfo.fromPlatform(),
-                        builder: (context, snapshot) => snapshot.connectionState == ConnectionState.done
-                            ? FLauncherAboutDialog(packageInfo: snapshot.data!)
-                            : Container(),
-                      )
+    return Column(
+      children: [
+        Text(localizations.settings, style: Theme.of(context).textTheme.titleLarge),
+        const Divider(),
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                FocusableSettingsTile(
+                  autofocus: true,
+                  leading: const Icon(Icons.apps),
+                  title: Text(localizations.applications, style: Theme.of(context).textTheme.bodyMedium),
+                  onPressed: () => Navigator.of(context).pushNamed(ApplicationsPanelPage.routeName),
+                ),
+                FocusableSettingsTile(
+                  leading: const Icon(Icons.auto_awesome_mosaic_outlined),
+                  title: Text('Interface', style: Theme.of(context).textTheme.bodyMedium),
+                  onPressed: () => Navigator.of(context).pushNamed(InterfaceSettingsPage.routeName),
+                ),
+                FocusableSettingsTile(
+                  leading: const Icon(Icons.settings_suggest_outlined),
+                  title: Text('System', style: Theme.of(context).textTheme.bodyMedium),
+                  onPressed: () => Navigator.of(context).pushNamed(GeneralSettingsPage.routeName),
+                ),
+                const Divider(),
+                FocusableSettingsTile(
+                  leading: const Icon(Icons.settings_outlined),
+                  title: Text(localizations.systemSettings, style: Theme.of(context).textTheme.bodyMedium),
+                  onPressed: () => context.read<AppsService>().openSettings(),
+                ),
+                FocusableSettingsTile(
+                  leading: const Icon(Icons.info_outline),
+                  title: Text(localizations.aboutFlauncher, style: Theme.of(context).textTheme.bodyMedium),
+                  onPressed: () => showDialog(
+                    context: context,
+                    builder: (_) => FutureBuilder<PackageInfo>(
+                      future: PackageInfo.fromPlatform(),
+                      builder: (context, snapshot) => snapshot.connectionState == ConnectionState.done && snapshot.hasData
+                          ? LTvLauncherAboutDialog(packageInfo: snapshot.data!)
+                          : Container(),
                     )
                   )
-                ]
-              )
+                )
+              ]
             )
           )
-        ]
-      )
+        )
+      ]
     );
-  }
-
-
-
-  Future<void> _openScreensaverSettings() async {
-    // Open Android screensaver settings with native fallbacks
-    const platform = MethodChannel('me.efesser.flauncher/method');
-    platform.invokeMethod('openScreensaverSettings');
   }
 }

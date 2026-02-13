@@ -18,6 +18,7 @@
 
 import 'package:flauncher/actions.dart';
 import 'package:flauncher/providers/apps_service.dart';
+import 'package:flauncher/providers/settings_service.dart';
 import 'package:flauncher/providers/launcher_state.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -56,7 +57,14 @@ class FLauncherApp extends StatelessWidget
     LauncherState launcherState = context.read<LauncherState>();
     launcherState.refresh(appsService);
 
-    return MaterialApp(
+    return Consumer<SettingsService>(
+      builder: (context, settings, _) {
+        final accentColor = settings.accentColor;
+
+        return MaterialApp(
+      scrollBehavior: const MaterialScrollBehavior().copyWith(
+        overscroll: false,
+      ),
       shortcuts: {
         ...WidgetsApp.defaultShortcuts,
         const SingleActivator(LogicalKeyboardKey.escape): _backIntents,
@@ -75,38 +83,68 @@ class FLauncherApp extends StatelessWidget
       ],
       supportedLocales: AppLocalizations.supportedLocales,
       title: 'FLauncher',
-      theme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark,
-        primarySwatch: _swatch,
-        cardColor: const Color(0xFF1E1E1E), // Dark surface color
-        canvasColor: const Color(0xFF121212), // Dark background
-        dialogBackgroundColor: const Color(0xFF1E1E1E),
-        scaffoldBackgroundColor: const Color(0xFF121212), // Dark background
-        textButtonTheme: TextButtonThemeData(
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.white, // Revert to white for settings list
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            )
+        theme: ThemeData(
+          useMaterial3: true,
+          brightness: Brightness.dark,
+          // Use ColorScheme based on accent color
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: accentColor,
+            brightness: Brightness.dark,
+            primary: accentColor,
+            secondary: accentColor,
+            surface: const Color(0xFF1E1E1E),
+            background: const Color(0xFF121212),
+          ),
+          cardColor: const Color(0xFF1E1E1E), // Dark surface color
+          canvasColor: const Color(0xFF121212), // Dark background
+          dialogBackgroundColor: const Color(0xFF1E1E1E),
+          scaffoldBackgroundColor: const Color(0xFF121212), // Dark background
+          textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white, // Revert to white for settings list
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              )
+          ),
+          dialogTheme: DialogTheme(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            backgroundColor: const Color(0xFF1E1E1E),
+            titleTextStyle: Typography.material2018().white.titleLarge,
+            contentTextStyle: Typography.material2018().white.bodyMedium,
+          ),
+          appBarTheme: const AppBarTheme(elevation: 0, backgroundColor: Colors.transparent),
+          typography: Typography.material2018(),
+          inputDecorationTheme: InputDecorationTheme(
+            focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+            labelStyle: Typography.material2018().white.bodyMedium,
+          ),
+          textSelectionTheme: TextSelectionThemeData(
+            cursorColor: accentColor,
+            selectionColor: accentColor.withOpacity(0.4),
+            selectionHandleColor: accentColor,
+          ),
+          // Override indicator colors for focus
+          indicatorColor: accentColor,
+          progressIndicatorTheme: ProgressIndicatorThemeData(color: accentColor),
+          sliderTheme: SliderThemeData(
+            activeTrackColor: accentColor,
+            thumbColor: accentColor,
+            inactiveTrackColor: accentColor.withOpacity(0.3),
+          ),
+          toggleButtonsTheme: ToggleButtonsThemeData(
+            selectedColor: accentColor,
+            fillColor: accentColor.withOpacity(0.1),
+          ),
+          switchTheme: SwitchThemeData(
+            thumbColor: MaterialStateProperty.resolveWith((states) {
+              if (states.contains(MaterialState.selected)) return accentColor;
+              return null;
+            }),
+            trackColor: MaterialStateProperty.resolveWith((states) {
+              if (states.contains(MaterialState.selected)) return accentColor.withOpacity(0.5);
+              return null;
+            }),
+          ),
         ),
-        dialogTheme: DialogTheme(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          backgroundColor: const Color(0xFF1E1E1E),
-          titleTextStyle: Typography.material2018().white.titleLarge,
-          contentTextStyle: Typography.material2018().white.bodyMedium,
-        ),
-        appBarTheme: const AppBarTheme(elevation: 0, backgroundColor: Colors.transparent),
-        typography: Typography.material2018(),
-        inputDecorationTheme: InputDecorationTheme(
-          focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)),
-          labelStyle: Typography.material2018().white.bodyMedium,
-        ),
-        textSelectionTheme: TextSelectionThemeData(
-          cursorColor: Colors.white,
-          selectionColor: _swatch[200],
-          selectionHandleColor: _swatch[200],
-        ),
-      ),
       home: Builder(
         builder: (context) => PopScope(
           canPop: false,
@@ -117,6 +155,7 @@ class FLauncherApp extends StatelessWidget
           }
         )
       ),
-    );
+      );
+    });
   }
 }

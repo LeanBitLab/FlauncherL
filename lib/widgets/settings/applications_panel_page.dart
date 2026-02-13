@@ -185,7 +185,7 @@ class _ApplicationsPanelPageState extends State<ApplicationsPanelPage> {
               ? Colors.white.withOpacity(0.15)
               : (focused ? Colors.white.withOpacity(0.1) : Colors.transparent),
           borderRadius: BorderRadius.circular(12),
-          border: focused ? Border.all(color: Colors.white, width: 2) : null,
+          border: focused ? Border.all(color: Theme.of(context).colorScheme.primary, width: 2) : null,
         ),
         child: Icon(
           icon,
@@ -459,13 +459,14 @@ class _AppListItemState extends State<_AppListItem>
           child: Builder(
             builder: (context) {
               final focused = Focus.of(context).hasFocus;
+              final primaryColor = Theme.of(context).colorScheme.primary;
               return AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
+                duration: const Duration(milliseconds: 50),
                 decoration: BoxDecoration(
                   color: focused ? Colors.white.withOpacity(0.05) : Colors.white.withOpacity(0.05), // Keep background consistent or same logic
                   borderRadius: BorderRadius.circular(12),
                   border: focused
-                      ? Border.all(color: Colors.white, width: 2)
+                      ? Border.all(color: primaryColor, width: 2)
                       : Border.all(color: Colors.transparent, width: 2),
                   boxShadow: focused
                       ? const [BoxShadow(color: Colors.black54, blurRadius: 8, spreadRadius: 1)]
@@ -503,13 +504,18 @@ class _AppListItemState extends State<_AppListItem>
                         title: Text(
                           widget.application.name,
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Colors.white,
                               fontWeight: focused ? FontWeight.bold : FontWeight.normal
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         leading: appIcon,
-                        trailing: const Icon(Icons.chevron_right, size: 20, color: Colors.white30),
+                        trailing: Icon(
+                          Icons.chevron_right, 
+                          size: 20, 
+                          color: focused ? primaryColor : Colors.white30
+                        ),
                       );
                     },
                   ),

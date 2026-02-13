@@ -46,7 +46,7 @@ secretProperties.setProperty("signing_key_alias", "${System.getenv('FLAUNCHER_SI
 
 android {
     defaultConfig {
-        applicationId "me.efesser.flauncherl"
+        applicationId "com.leanbitlab.ltvL"
         compileSdk 35
         minSdk 21
         targetSdk 35
@@ -92,15 +92,15 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
-    namespace 'me.efesser.flauncher'
+    namespace 'com.leanbitlab.ltvL'
 
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
             def abi = output.getFilter(com.android.build.OutputFile.ABI)
             if (abi != null) {
-                outputFileName = "FlauncherL-${abi}-${variant.buildType.name}.apk"
+                outputFileName = "LTvLauncher-${abi}-${variant.buildType.name}.apk"
             } else {
-                outputFileName = "FlauncherL-universal-${variant.buildType.name}.apk"
+                outputFileName = "LTvLauncher-universal-${variant.buildType.name}.apk"
             }
         }
     }

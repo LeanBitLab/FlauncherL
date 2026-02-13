@@ -134,6 +134,20 @@ class AppsService extends ChangeNotifier
 
     _initialized = true;
     notifyListeners();
+    
+    // Pre-cache icons for visible apps
+    _preCacheIcons();
+  }
+
+  Future<void> _preCacheIcons() async {
+    // Only cache apps that are not hidden
+    final visibleApps = _applications.values.where((app) => !app.hidden).toList();
+    for (var app in visibleApps) {
+      // Don't await, let it run in background
+      getAppIcon(app.packageName);
+      // Also cache banner if it's likely to be needed soon
+      getAppBanner(app.packageName);
+    }
   }
 
   AppsCompanion _buildAppCompanion(dynamic data) {
@@ -155,6 +169,16 @@ class AppsService extends ChangeNotifier
     final nonTvApplications = _applications.values.where((application) => application.sideloaded == true);
 
     return _database.transaction(() async {
+      if (nonTvApplications.isNotEmpty) {
+        int categoryId = await addCategory("Non-TV Apps",
+          shouldNotifyListeners: false,
+        );
+        Category nonTvAppsCategory = _categoriesById[categoryId]!;
+        for (final app in nonTvApplications) {
+          await addToCategory(app, nonTvAppsCategory, shouldNotifyListeners: false);
+        }
+      }
+
       if (tvApplications.isNotEmpty) {
         int categoryId = await addCategory("TV Apps",
             type: CategoryType.grid, shouldNotifyListeners: false
@@ -165,15 +189,8 @@ class AppsService extends ChangeNotifier
           await addToCategory(app, tvAppsCategory, shouldNotifyListeners: false);
         }
       }
-      if (nonTvApplications.isNotEmpty) {
-        int categoryId = await addCategory("Non-TV Apps",
-          shouldNotifyListeners: false,
-        );
-        Category nonTvAppsCategory = _categoriesById[categoryId]!;
-        for (final app in nonTvApplications) {
-          await addToCategory(app, nonTvAppsCategory, shouldNotifyListeners: false);
-        }
-      }
+
+      await addCategory("Favorites", shouldNotifyListeners: false);
     });
   }
 

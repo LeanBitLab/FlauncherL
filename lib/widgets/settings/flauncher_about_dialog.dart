@@ -20,10 +20,10 @@ import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class FLauncherAboutDialog extends StatelessWidget {
+class LTvLauncherAboutDialog extends StatelessWidget {
   final PackageInfo packageInfo;
 
-  FLauncherAboutDialog({
+  LTvLauncherAboutDialog({
     Key? key,
     required this.packageInfo,
   }) : super(key: key);
@@ -33,10 +33,13 @@ class FLauncherAboutDialog extends StatelessWidget {
     AppLocalizations localizations = AppLocalizations.of(context)!;
 
     return AboutDialog(
-      applicationName: "FlauncherL",
+      applicationName: "LTvLauncher",
       applicationVersion: "v${packageInfo.version} (${packageInfo.buildNumber})",
-      applicationIcon: Image.asset("assets/logo.png", height: 72),
-      applicationLegalese: "© 2021 Étienne Fesser, 2024 Oscar Rojas\nModified by LeanBitLab",
+      applicationIcon: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Image.asset("assets/icon.png", height: 72),
+      ),
+      applicationLegalese: "Developed by LeanBitLab\nBased on FLauncher © 2021 Étienne Fesser",
       children: [
         SizedBox(height: 24),
         Text(localizations.textAboutDialog("https://github.com/LeanBitLab/FlauncherL"))

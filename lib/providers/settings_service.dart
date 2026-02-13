@@ -19,6 +19,7 @@
 import 'dart:async';
 
 import 'package:flauncher/widgets/settings/back_button_actions.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -35,11 +36,23 @@ const _timeFormat = "time_format";
 const _wifiUsagePeriod = "wifi_usage_period";
 const _showWifiWidgetInStatusBar = "show_wifi_widget_in_status_bar";
 const _showNetworkIndicatorInStatusBar = "show_network_indicator_in_status_bar";
+const _accentColor = "accent_color";
 
 // WiFi usage period options
 const String WIFI_USAGE_DAILY = "daily";
 const String WIFI_USAGE_WEEKLY = "weekly";
 const String WIFI_USAGE_MONTHLY = "monthly";
+
+// Accent color presets (hex values)
+const String ACCENT_COLOR_PURPLE = "7C4DFF";
+const String ACCENT_COLOR_TEAL = "00BFA5";
+const String ACCENT_COLOR_BLUE = "2979FF";
+const String ACCENT_COLOR_ORANGE = "FF6D00";
+const String ACCENT_COLOR_PINK = "F50057";
+const String ACCENT_COLOR_GREEN = "00C853";
+const String ACCENT_COLOR_WHITE = "FFFFFF";
+const String ACCENT_COLOR_YELLOW = "FFD600";
+const String ACCENT_COLOR_RED = "D50000";
 
 class SettingsService extends ChangeNotifier {
   static final defaultDateFormat = "EEEE d";
@@ -72,6 +85,13 @@ class SettingsService extends ChangeNotifier {
   bool get showWifiWidgetInStatusBar => _sharedPreferences.getBool(_showWifiWidgetInStatusBar) ?? true;
 
   bool get showNetworkIndicatorInStatusBar => _sharedPreferences.getBool(_showNetworkIndicatorInStatusBar) ?? true;
+
+  String get accentColorHex => _sharedPreferences.getString(_accentColor) ?? ACCENT_COLOR_PURPLE;
+
+  Color get accentColor {
+    final hex = accentColorHex;
+    return Color(int.parse("0xFF$hex"));
+  }
 
   SettingsService(
     this._sharedPreferences
@@ -135,5 +155,10 @@ class SettingsService extends ChangeNotifier {
 
   Future<void> setShowNetworkIndicatorInStatusBar(bool show) async {
     return set(_showNetworkIndicatorInStatusBar, show);
+  }
+
+  Future<void> setAccentColor(String colorHex) async {
+    await _sharedPreferences.setString(_accentColor, colorHex);
+    notifyListeners();
   }
 }

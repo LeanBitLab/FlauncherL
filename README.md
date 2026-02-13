@@ -1,14 +1,14 @@
-# FlauncherL
+# LTvLauncher
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/banner_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="assets/banner_light.svg">
-  <img alt="FlauncherL Banner" src="assets/banner_light.svg">
+  <img alt="LTvLauncher Banner" src="assets/banner_light.svg">
 </picture>
 
 [![Download](https://img.shields.io/github/v/release/LeanBitLab/FlauncherL?label=Download&style=for-the-badge&color=7C4DFF)](https://github.com/LeanBitLab/FlauncherL/releases/latest) [![Downloads](https://img.shields.io/github/downloads/LeanBitLab/FlauncherL/total?style=for-the-badge&color=7C4DFF&label=Downloads)](https://github.com/LeanBitLab/FlauncherL/releases) [![Stars](https://img.shields.io/github/stars/LeanBitLab/FlauncherL?style=for-the-badge&color=7C4DFF)](https://github.com/LeanBitLab/FlauncherL/stargazers)
 
-**FlauncherL** is a fork of [FLauncher](https://github.com/osrosal/flauncher) (originally by [etienn01](https://gitlab.com/flauncher/flauncher)) - an open-source alternative launcher for Android TV.
+**LTvLauncher** is a fork of [FLauncher](https://github.com/osrosal/flauncher) (originally by [etienn01](https://gitlab.com/flauncher/flauncher)) - an open-source alternative launcher for Android TV.
 
 This customized version introduces usability enhancements and some UX improvements by [LeanBitLab](https://github.com/LeanBitLab).
 
@@ -22,25 +22,31 @@ This customized version introduces usability enhancements and some UX improvemen
 - **Enhanced Focus Indicator** - New double-border design ensures perfect visibility on any background.
 - **Smart Navigation** - Fixed "bounce back" issues and optimized focus traversal for a smoother experience.
 - **Refined Settings** - Reorganized menus with a new "Miscellaneous" section and unified focus styles.
+- **Accent Color Support** - Personalize the UI with multiple color presets.
+- **Improved Sorting** - Easily reorder categories using Left/Right arrow keys instead of finicky gestures.
+- **Left Side Settings** - Reorganized settings panel now opens on the left for better reach.
+- **Brightness Scheduler (Experimental)** - Automatically adjust system brightness based on time of day (Requires `WRITE_SETTINGS` permission via ADB).
 - **New Categories** - Added "All Apps" and "Favorites" with auto-population support.
 - **Optimizations** - Improved performance with aggressive icon caching and code cleanups.
 
-
-
+> [!WARNING]
+> **Brightness Scheduler is an experimental feature.** It is currently untested across all devices and may be removed or modified in future versions based on user feedback.
 
 ## Screenshots
 
 <table>
   <tr>
     <td align="center">Home Screen</td>
-    <td align="center">Settings</td>
-    <td align="center">Widget</td>
+    <td align="center">Settings 1</td>
+    <td align="center">Settings 2</td>
+    <td align="center">Settings 3</td>
     <td align="center">Screensaver</td>
   </tr>
   <tr>
     <td><img src="docs/images/screenshot_1.png" width="100%" alt="Home Screen"/></td>
-    <td><img src="docs/images/screenshot_2.png" width="100%" alt="Settings"/></td>
-    <td><img src="docs/images/screenshot_3.png" width="100%" alt="Widget"/></td>
+    <td><img src="docs/images/screenshot_2.png" width="100%" alt="Settings 1"/></td>
+    <td><img src="docs/images/screenshot_3.png" width="100%" alt="Settings 2"/></td>
+    <td><img src="docs/images/screenshot_4.png" width="100%" alt="Settings 3"/></td>
     <td><img src="docs/images/screensaver.gif" width="100%" alt="Screensaver"/></td>
   </tr>
 </table>
@@ -59,10 +65,10 @@ This customized version introduces usability enhancements and some UX improvemen
 - [x] Support for non-TV (sideloaded) apps
 - [x] Navigation sound feedback
 
-## Set FlauncherL as default launcher
+## Set LTvLauncher as default launcher
 
 ### Method 1: Remap the Home button
-This is the "safer" and easiest way. Use [Button Mapper](https://play.google.com/store/apps/details?id=flar2.homebutton) to remap the Home button of the remote to launch FlauncherL.
+This is the "safer" and easiest way. Use [Button Mapper](https://play.google.com/store/apps/details?id=flar2.homebutton) to remap the Home button of the remote to launch LTvLauncher.
 
 ### Method 2: Disable the default launcher
 **:warning: Disclaimer :warning:**
@@ -104,5 +110,5 @@ Please note that changing wallpaper requires a file explorer to be installed on 
 
 ---
 
-### FlauncherL
+### LTvLauncher
 - Customizations by [LeanBitLab](https://github.com/LeanBitLab)

@@ -28,7 +28,11 @@ import 'package:flauncher/widgets/settings/wifi_usage_period_page.dart';
 import 'package:flauncher/widgets/settings/back_button_action_page.dart';
 import 'package:flauncher/widgets/settings/date_time_format_page.dart';
 import 'package:flauncher/widgets/settings/app_details_page.dart';
+import 'package:flauncher/widgets/settings/accent_color_page.dart';
+import 'package:flauncher/widgets/settings/brightness_settings_page.dart';
 import 'package:flauncher/widgets/settings/misc_panel_page.dart';
+import 'package:flauncher/widgets/settings/interface_settings_page.dart';
+import 'package:flauncher/widgets/settings/general_settings_page.dart';
 import 'package:flauncher/models/app.dart';
 import 'package:flutter/material.dart';
 
@@ -45,50 +49,70 @@ class _SettingsPanelState extends State<SettingsPanel> {
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
   @override
-  Widget build(BuildContext context) => WillPopScope(
-    onWillPop: () async => !await _navigatorKey.currentState!.maybePop(),
-    child: Scaffold(
-      backgroundColor: Colors.transparent,
-      body: SidePanelDialog(
-        width: 350,
-        isRightSide: false, // Left side as requested by user
-        child: Navigator(
-          key: _navigatorKey,
-          initialRoute: widget.initialRoute ?? SettingsPanelPage.routeName,
-          onGenerateRoute: (settings) {
-            switch (settings.name) {
-              case SettingsPanelPage.routeName:
-                return MaterialPageRoute(builder: (_) => SettingsPanelPage());
-              case WallpaperPanelPage.routeName:
-                return MaterialPageRoute(builder: (_) => WallpaperPanelPage());
-              case StatusBarPanelPage.routeName:
-                return MaterialPageRoute(builder: (_) => StatusBarPanelPage());
-              case GradientPanelPage.routeName:
-                return MaterialPageRoute(builder: (_) => GradientPanelPage());
-              case ApplicationsPanelPage.routeName:
-                return MaterialPageRoute(builder: (_) => ApplicationsPanelPage());
-              case LauncherSectionsPanelPage.routeName:
-                return MaterialPageRoute(builder: (_) => LauncherSectionsPanelPage());
-              case LauncherSectionPanelPage.routeName:
-                return MaterialPageRoute(
-                    builder: (_) => LauncherSectionPanelPage(sectionIndex: settings.arguments as int?));
-              case WifiUsagePeriodPage.routeName:
-                return MaterialPageRoute(builder: (_) => WifiUsagePeriodPage());
-              case BackButtonActionPage.routeName:
-                return MaterialPageRoute(builder: (_) => BackButtonActionPage());
-              case DateTimeFormatPage.routeName:
-                return MaterialPageRoute(builder: (_) => DateTimeFormatPage());
-              case MiscPanelPage.routeName:
-                return MaterialPageRoute(builder: (_) => MiscPanelPage());
-              case AppDetailsPage.routeName:
-                 return MaterialPageRoute(
-                    builder: (_) => AppDetailsPage(application: settings.arguments as App));
-              default:
-                throw ArgumentError.value(settings.name, "settings.name", "Route not supported.");
-            }
-          },
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async => !await _navigatorKey.currentState!.maybePop(),
+      child: Scaffold(
+        backgroundColor: Colors.black54, // Dim the background
+        body: Stack(
+          children: [
+            // Tap outside to close
+            GestureDetector(
+              onTap: () => Navigator.of(context).pop(),
+              child: Container(color: Colors.transparent),
+            ),
+            // The side panel
+            SidePanelDialog(
+              width: 350,
+              isRightSide: false,
+              child: Navigator(
+                key: _navigatorKey,
+                initialRoute: widget.initialRoute ?? SettingsPanelPage.routeName,
+                onGenerateRoute: (settings) {
+                  switch (settings.name) {
+                    case SettingsPanelPage.routeName:
+                      return MaterialPageRoute(builder: (_) => SettingsPanelPage());
+                    case GeneralSettingsPage.routeName:
+                      return MaterialPageRoute(builder: (_) => GeneralSettingsPage());
+                    case InterfaceSettingsPage.routeName:
+                      return MaterialPageRoute(builder: (_) => InterfaceSettingsPage());
+                    case WallpaperPanelPage.routeName:
+                      return MaterialPageRoute(builder: (_) => WallpaperPanelPage());
+                    case StatusBarPanelPage.routeName:
+                      return MaterialPageRoute(builder: (_) => StatusBarPanelPage());
+                    case GradientPanelPage.routeName:
+                      return MaterialPageRoute(builder: (_) => GradientPanelPage());
+                    case ApplicationsPanelPage.routeName:
+                      return MaterialPageRoute(builder: (_) => ApplicationsPanelPage());
+                    case LauncherSectionsPanelPage.routeName:
+                      return MaterialPageRoute(builder: (_) => LauncherSectionsPanelPage());
+                    case LauncherSectionPanelPage.routeName:
+                      return MaterialPageRoute(
+                          builder: (_) => LauncherSectionPanelPage(sectionIndex: settings.arguments as int?));
+                    case WifiUsagePeriodPage.routeName:
+                      return MaterialPageRoute(builder: (_) => WifiUsagePeriodPage());
+                    case BackButtonActionPage.routeName:
+                      return MaterialPageRoute(builder: (_) => BackButtonActionPage());
+                    case DateTimeFormatPage.routeName:
+                      return MaterialPageRoute(builder: (_) => DateTimeFormatPage());
+                    case MiscPanelPage.routeName:
+                      return MaterialPageRoute(builder: (_) => MiscPanelPage());
+                    case AccentColorPage.routeName:
+                      return MaterialPageRoute(builder: (_) => AccentColorPage());
+                    case BrightnessSettingsPage.routeName:
+                      return MaterialPageRoute(builder: (_) => BrightnessSettingsPage());
+                    case AppDetailsPage.routeName:
+                      return MaterialPageRoute(
+                          builder: (_) => AppDetailsPage(application: settings.arguments as App));
+                    default:
+                      throw ArgumentError.value(settings.name, "settings.name", "Route not supported.");
+                  }
+                },
+              ),
+            ),
+          ],
         ),
       ),
-    ),
-  );
+    );
+  }
 }

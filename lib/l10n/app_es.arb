@@ -32,9 +32,7 @@
     "@formattedDate": {
         "placeholders": {
             "dateString": {
-                "type": {
-                    "type": "String"
-                }
+                "type": "String"
             }
         }
     },
@@ -42,9 +40,7 @@
     "@formattedTime": {
         "placeholders": {
             "timeString": {
-                "type": {
-                    "type": "String"
-                }
+                "type": "String"
             }
         }
     },
@@ -86,7 +82,7 @@
     "showCategoryTitles": "Mostrar títulos de categorías",
     "sort": "Orden",
     "systemSettings": "Ajustes del sistema",
-    "textAboutDialog": "FlauncherL es un lanzador de código abierto personalizado para Android TV, basado en FLauncher.\n\nDesarrollado por LeanBitLab.\nCódigo fuente disponible en {repoUrl}.\n\nLogo creado por Katie (@fureturoe) y diseño por @FXCostanzo.",
+    "textAboutDialog": "LTvLauncher es un lanzador de código abierto personalizado para Android TV, basado en FLauncher.\n\nDesarrollado por LeanBitLab.\nCódigo fuente disponible en {repoUrl}.",
     "@textAboutDialog": {
         "placeholders": {
             "repoUrl": {

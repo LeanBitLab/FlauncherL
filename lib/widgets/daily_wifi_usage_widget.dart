@@ -1,6 +1,7 @@
 import 'package:flauncher/providers/network_service.dart';
 import 'package:flauncher/providers/settings_service.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class DailyWifiUsageWidget extends StatelessWidget {
@@ -22,14 +23,14 @@ class DailyWifiUsageWidget extends StatelessWidget {
         String label;
         switch (period) {
           case 'weekly':
-            label = 'Weekly Usage';
+            label = 'Weekly: ';
             break;
           case 'monthly':
-            label = 'Monthly Usage';
+            label = 'Monthly: ';
             break;
           case 'daily':
           default:
-            label = 'Daily Usage';
+            label = 'Daily: ';
             break;
         }
 
@@ -39,9 +40,24 @@ class DailyWifiUsageWidget extends StatelessWidget {
             final usage = snapshot.data ?? networkService.dailyWifiUsage;
             final usageString = _formatBytes(usage);
 
-            return Text(
-              "$label: $usageString",
-              style: Theme.of(context).textTheme.titleMedium,
+            return RichText(
+              text: TextSpan(
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.white,
+                  shadows: [
+                    Shadow(color: Colors.black54, offset: Offset(0, 2), blurRadius: 4)
+                  ],
+                ),
+                children: [
+                  TextSpan(text: label),
+                  TextSpan(
+                    text: usageString,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
             );
           },
         );

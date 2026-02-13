@@ -523,8 +523,7 @@ SettingsService mkSettingsService() {
 WallpaperService mkWallpaperService([bool wallpaper = true]) {
   final wallpaperService = MockWallpaperService();
   when(wallpaperService.gradient).thenReturn(FLauncherGradients.greatWhale);
-  when(wallpaperService.wallpaper).thenReturn(wallpaper ? Image.asset('assets/logo.png').image : null);
-  return wallpaperService;
+        when(wallpaperService.wallpaper).thenReturn(wallpaper ? Image.asset('assets/icon.png').image : null);  return wallpaperService;
 }
 
 AppsService mkAppService() {

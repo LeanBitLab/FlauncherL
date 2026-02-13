@@ -79,38 +79,10 @@ class _LauncherSectionsPanelPageState extends State<LauncherSectionsPanelPage> {
     );
   }
 
-  Timer? _longPressTimer;
-  bool _isLongPress = false;
-
-  void _handleSelectDown(int index) {
-    if (_movingIndex != null) return; // Ignore long press logic if already moving
-    if (_isLongPress) return; // Already triggered long press
-    if (_longPressTimer?.isActive ?? false) return; // Already waiting (repeat), don't reset timer
-
-    _isLongPress = false;
-    _longPressTimer?.cancel();
-    _longPressTimer = Timer(const Duration(milliseconds: 500), () {
-      _isLongPress = true;
-      setState(() {
-        _movingIndex = index;
-      });
-      // Optional: Add haptic feedback here
-    });
-  }
-
-  void _handleSelectUp(int index) {
-    if (_longPressTimer?.isActive ?? false) {
-      _longPressTimer?.cancel();
-      // Only navigate if we didn't just trigger long press AND we weren't already moving
-      if (!_isLongPress && _movingIndex == null) {
-         Navigator.pushNamed(context, LauncherSectionPanelPage.routeName, arguments: index);
-      }
-    }
-    _isLongPress = false;
-  }
-
   Widget _section(BuildContext context, LauncherSection section, int index, int totalCount) {
     AppLocalizations localizations = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     String title = localizations.spacer;
     if (section is Category) {
@@ -126,86 +98,126 @@ class _LauncherSectionsPanelPageState extends State<LauncherSectionsPanelPage> {
     return Padding(
       // Use ObjectKey to ensure uniqueness even if IDs collide across different types
       key: ObjectKey(section),
-      padding: EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Focus(
         onKeyEvent: (node, event) {
+          if (event is! KeyDownEvent) return KeyEventResult.ignored;
+
           if (isMoving) {
-            if (event is KeyDownEvent) {
-               if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
-                if (index > 0) {
-                   _move(index, index - 1);
-                   return KeyEventResult.handled;
-                }
-              } else if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
-                if (index < totalCount - 1) {
-                  _move(index, index + 1);
-                  return KeyEventResult.handled;
-                }
-              } else if (event.logicalKey == LogicalKeyboardKey.select || event.logicalKey == LogicalKeyboardKey.enter || event.logicalKey == LogicalKeyboardKey.gameButtonA || event.logicalKey == LogicalKeyboardKey.escape) {
-                _endMove();
+            if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+              if (index > 0) {
+                _move(index, index - 1);
                 return KeyEventResult.handled;
               }
+            } else if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+              if (index < totalCount - 1) {
+                _move(index, index + 1);
+                return KeyEventResult.handled;
+              }
+            } else if (event.logicalKey == LogicalKeyboardKey.select ||
+                event.logicalKey == LogicalKeyboardKey.enter ||
+                event.logicalKey == LogicalKeyboardKey.gameButtonA ||
+                event.logicalKey == LogicalKeyboardKey.escape ||
+                event.logicalKey == LogicalKeyboardKey.arrowLeft ||
+                event.logicalKey == LogicalKeyboardKey.arrowRight) {
+              _endMove();
+              return KeyEventResult.handled;
             }
           } else {
-             // Not Moving - Handle Long Press for Sort, Short Press for Settings
-             if (event.logicalKey == LogicalKeyboardKey.select || event.logicalKey == LogicalKeyboardKey.enter || event.logicalKey == LogicalKeyboardKey.gameButtonA) {
-               if (event is KeyDownEvent) {
-                 _handleSelectDown(index);
-                 return KeyEventResult.handled;
-               } else if (event is KeyUpEvent) {
-                 _handleSelectUp(index);
-                 return KeyEventResult.handled;
-               }
-             }
+            // Not Moving
+            if (event.logicalKey == LogicalKeyboardKey.arrowLeft ||
+                event.logicalKey == LogicalKeyboardKey.arrowRight) {
+              setState(() {
+                _movingIndex = index;
+              });
+              return KeyEventResult.handled;
+            } else if (event.logicalKey == LogicalKeyboardKey.select ||
+                event.logicalKey == LogicalKeyboardKey.enter ||
+                event.logicalKey == LogicalKeyboardKey.gameButtonA) {
+              Navigator.pushNamed(context, LauncherSectionPanelPage.routeName, arguments: index);
+              return KeyEventResult.handled;
+            }
           }
           return KeyEventResult.ignored;
         },
-        child: Builder(
-          builder: (context) {
+        child: Builder(builder: (context) {
             final bool focused = Focus.of(context).hasFocus;
-            return Card(
-              color: isMoving ? Theme.of(context).colorScheme.primaryContainer : null,
-              margin: EdgeInsets.zero,
-              shape: focused ? RoundedRectangleBorder(
-                  side: BorderSide(color: Colors.white, width: 2),
-                  borderRadius: BorderRadius.circular(12)
-              ) : null,
-              child: ListTile(
-                dense: true,
-                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                title: Text(title,
-                    style: isMoving
-                        ? Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onPrimaryContainer)
-                        : Theme.of(context).textTheme.bodyMedium),
-                trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                       if (isMoving) ...[
-                         Icon(Icons.keyboard_arrow_up, color: Theme.of(context).colorScheme.onPrimaryContainer),
-                         Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onPrimaryContainer),
-                         SizedBox(width: 8),
-                       ],
-                       // Setting icon removed as requested
-                    ]
-                ),
-                leading: ReorderableDragStartListener(
-                  index: index,
-                  child: Icon(Icons.drag_handle, color: isMoving ? Theme.of(context).colorScheme.onPrimaryContainer : null),
-                ),
-                onTap: () {
+            
+            // Determine colors based on state
+            final Color backgroundColor = isMoving 
+                ? colorScheme.primaryContainer 
+                : (focused ? Colors.white10 : Colors.transparent);
+            
+            final Color textColor = isMoving 
+                ? colorScheme.onPrimaryContainer 
+                : (focused ? Colors.white : Colors.white70);
+            
+            final Color iconColor = isMoving 
+                ? colorScheme.onPrimaryContainer 
+                : (focused ? colorScheme.primary : Colors.white38);
+
+            return GestureDetector(
+              onTap: () {
                    if (isMoving) {
                       _endMove();
                    } else {
                       Navigator.pushNamed(context, LauncherSectionPanelPage.routeName, arguments: index);
                    }
-                },
-                onLongPress: () {
+              },
+              onLongPress: () {
                    if (!isMoving) {
                       setState(() {
                         _movingIndex = index;
                       });
                    }
-                },
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 50),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                decoration: BoxDecoration(
+                  color: backgroundColor,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: focused ? colorScheme.primary : (isMoving ? colorScheme.primary : Colors.transparent),
+                    width: focused ? 2 : (isMoving ? 1 : 0),
+                  ),
+                  boxShadow: focused 
+                      ? [BoxShadow(color: Colors.black45, blurRadius: 8, offset: Offset(0, 4))] 
+                      : null,
+                ),
+                child: Row(
+                  children: [
+                    // Drag Handle Icon
+                    ReorderableDragStartListener(
+                      index: index,
+                      child: Icon(
+                        isMoving ? Icons.drag_indicator : Icons.drag_handle,
+                        color: iconColor,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    
+                    // Section Title
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: textColor,
+                          fontWeight: focused || isMoving ? FontWeight.bold : FontWeight.normal,
+                        ),
+                      ),
+                    ),
+                    
+                    // Move Indicators
+                    if (isMoving) ...[
+                       Icon(Icons.keyboard_arrow_up, color: textColor),
+                       const SizedBox(width: 4),
+                       Icon(Icons.keyboard_arrow_down, color: textColor),
+                    ] else ...[
+                       Icon(Icons.chevron_right, color: Colors.white24),
+                    ],
+                  ],
+                ),
               ),
             );
           }
@@ -213,6 +225,7 @@ class _LauncherSectionsPanelPageState extends State<LauncherSectionsPanelPage> {
       ),
     );
   }
+
 
   void _move(int oldIndex, int newIndex) {
     context.read<AppsService>().moveSectionInMemory(oldIndex, newIndex);
