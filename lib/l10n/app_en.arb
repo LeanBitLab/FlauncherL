@@ -100,5 +100,9 @@
     "typeInTheHourFormat": "Type in the hour format",
     "uninstall": "Uninstall",
     "wallpaper": "Wallpaper",
-    "withEllipsisAddTo": "Add to..."
+    "withEllipsisAddTo": "Add to...",
+    "timeBasedWallpaper": "Time based wallpaper",
+    "pickDayWallpaper": "Pick day wallpaper",
+    "pickNightWallpaper": "Pick night wallpaper",
+    "timeBasedWallpaperDescription": "Change wallpaper based on time of day (Day: 6:00 - 18:00)"
 }

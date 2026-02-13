@@ -20,7 +20,7 @@ import 'dart:async';
 
 import 'package:flauncher/widgets/settings/back_button_actions.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 const _appHighlightAnimationEnabledKey = "app_highlight_animation_enabled";
@@ -159,6 +159,13 @@ class SettingsService extends ChangeNotifier {
 
   Future<void> setAccentColor(String colorHex) async {
     await _sharedPreferences.setString(_accentColor, colorHex);
+    notifyListeners();
+  }
+
+  bool get timeBasedWallpaperEnabled => _sharedPreferences.getBool("time_based_wallpaper_enabled") ?? false;
+
+  Future<void> setTimeBasedWallpaperEnabled(bool enabled) async {
+    await _sharedPreferences.setBool("time_based_wallpaper_enabled", enabled);
     notifyListeners();
   }
 }
