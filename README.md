@@ -26,7 +26,7 @@ This customized version introduces usability enhancements and some UX improvemen
 - **Improved Sorting** - Easily reorder categories using Left/Right arrow keys instead of finicky gestures.
 - **Left Side Settings** - Reorganized settings panel now opens on the left for better reach.
 - **Brightness Scheduler (Experimental)** - Automatically adjust system brightness based on time of day (Requires `WRITE_SETTINGS` permission via ADB).
-- **New Categories** - Added "All Apps" and "Favorites" with auto-population support.
+- **New Category** - Added "Favorites".
 - **Optimizations** - Improved performance with aggressive icon caching and code cleanups.
 
 > [!WARNING]
