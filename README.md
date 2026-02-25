@@ -18,6 +18,7 @@ This customized version introduces usability enhancements and some UX improvemen
 - **Inbuilt OLED Screensaver** - Minimal screensaver with 30s clock position shifting to prevent burn-in.
 - **Easy WiFi Access** - Network indicator doubles as a shortcut to system WiFi settings.
 - **Quick Presets** - Select Time/Date formats and Category names from a list (No keyboard required).
+- **Time-Based Wallpaper** - Automatically switch between day and night backgrounds.
 - **Pitch Black Wallpaper** - Added a true black gradient background option.
 - **Enhanced Focus Indicator** - New double-border design ensures perfect visibility on any background.
 - **Smart Navigation** - Fixed "bounce back" issues and optimized focus traversal for a smoother experience.
