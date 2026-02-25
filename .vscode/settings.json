@@ -1,4 +1,8 @@
 {
     "java.configuration.updateBuildConfiguration": "automatic",
-    "java.compile.nullAnalysis.mode": "automatic"
+    "java.compile.nullAnalysis.mode": "automatic",
+    "editor.fontSize": 16,
+    "editor.minimap.sectionHeaderFontSize": 11,
+    "debug.console.fontSize": 16,
+    "markdown.preview.fontSize": 16
 }
