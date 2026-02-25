@@ -40,13 +40,7 @@ class WallpaperPanelPage extends StatelessWidget {
           Consumer<SettingsService>(
             builder: (_, settings, __) {
               return RoundedSwitchListTile(
-                title: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(localizations.timeBasedWallpaper),
-                    Text(localizations.timeBasedWallpaperDescription, style: Theme.of(context).textTheme.bodySmall),
-                  ],
-                ),
+                title: Text(localizations.timeBasedWallpaper),
                 secondary: Icon(Icons.access_time),
                 value: settings.timeBasedWallpaperEnabled,
                 onChanged: (value) => settings.setTimeBasedWallpaperEnabled(value),

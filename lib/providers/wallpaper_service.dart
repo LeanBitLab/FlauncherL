@@ -23,7 +23,6 @@ import 'package:flauncher/flauncher_channel.dart';
 import 'package:flauncher/gradients.dart';
 import 'package:flauncher/providers/settings_service.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -52,8 +51,15 @@ class WallpaperService extends ChangeNotifier {
     _init();
   }
 
+  bool _lastTimeBasedEnabled = false;
+
   void _onSettingsChanged() {
-    _updateWallpaper();
+    final enabled = _settingsService.timeBasedWallpaperEnabled;
+    if (enabled != _lastTimeBasedEnabled) {
+      _lastTimeBasedEnabled = enabled;
+      _updateTimerState();
+      _updateWallpaper();
+    }
   }
 
   @override
@@ -69,35 +75,46 @@ class WallpaperService extends ChangeNotifier {
     _wallpaperDayFile = File("${directory.path}/wallpaper_day");
     _wallpaperNightFile = File("${directory.path}/wallpaper_night");
 
+    _lastTimeBasedEnabled = _settingsService.timeBasedWallpaperEnabled;
     _updateWallpaper();
-    
-    // Start timer to check every minute
-    _timer = Timer.periodic(const Duration(minutes: 1), (_) => _updateWallpaper());
+    _updateTimerState();
   }
 
-  void _updateWallpaper() {
+  void _updateTimerState() {
+    final enabled = _settingsService.timeBasedWallpaperEnabled;
+    if (enabled && (_timer == null || !_timer!.isActive)) {
+      _timer = Timer.periodic(const Duration(minutes: 1), (_) => _updateWallpaper());
+    } else if (!enabled && _timer != null) {
+      _timer?.cancel();
+      _timer = null;
+    }
+  }
+
+  void _updateWallpaper({bool force = false}) {
     final now = DateTime.now();
     final isDay = now.hour >= 6 && now.hour < 18;
     final enabled = _settingsService.timeBasedWallpaperEnabled;
 
+    ImageProvider? newWallpaper;
+
     if (enabled) {
       if (isDay && _wallpaperDayFile.existsSync()) {
-        _wallpaper = FileImage(_wallpaperDayFile);
+        newWallpaper = FileImage(_wallpaperDayFile);
       } else if (!isDay && _wallpaperNightFile.existsSync()) {
-        _wallpaper = FileImage(_wallpaperNightFile);
+        newWallpaper = FileImage(_wallpaperNightFile);
       } else if (_wallpaperFile.existsSync()) {
-        _wallpaper = FileImage(_wallpaperFile); // Fallback
-      } else {
-        _wallpaper = null;
+        newWallpaper = FileImage(_wallpaperFile); // Fallback
       }
     } else {
       if (_wallpaperFile.existsSync()) {
-        _wallpaper = FileImage(_wallpaperFile);
-      } else {
-        _wallpaper = null;
+        newWallpaper = FileImage(_wallpaperFile);
       }
     }
-    notifyListeners();
+
+    if (_wallpaper != newWallpaper || force) {
+      _wallpaper = newWallpaper;
+      notifyListeners();
+    }
   }
 
   Future<void> pickWallpaper() async {
@@ -120,10 +137,15 @@ class WallpaperService extends ChangeNotifier {
     final imagePicker = ImagePicker();
     final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      Uint8List bytes = await pickedFile.readAsBytes();
-      await targetFile.writeAsBytes(bytes); // This will overwrite if exists
+      // Use stream for memory efficiency
+      final readStream = pickedFile.openRead();
+      final writeStream = targetFile.openWrite();
+      await readStream.cast<List<int>>().pipe(writeStream);
 
-      _updateWallpaper();
+      // Evict from cache to ensure UI updates
+      await FileImage(targetFile).evict();
+
+      _updateWallpaper(force: true);
     }
   }
 
